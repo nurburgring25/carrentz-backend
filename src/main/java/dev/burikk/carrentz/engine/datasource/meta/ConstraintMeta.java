@@ -1,7 +1,7 @@
 package dev.burikk.carrentz.engine.datasource.meta;
 
 import dev.burikk.carrentz.engine.util.Parameters;
-import com.sun.istack.internal.NotNull;
+import javax.validation.constraints.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collections;

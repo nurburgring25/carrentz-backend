@@ -9,8 +9,8 @@ import dev.burikk.carrentz.engine.entity.annotation.MarkAuditable;
 import dev.burikk.carrentz.engine.entity.annotation.MarkDeletable;
 import dev.burikk.carrentz.engine.util.Models;
 import dev.burikk.carrentz.engine.util.Parameters;
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -39,7 +39,7 @@ public class Table {
     private Table(
             @NotNull String mName,
             @NotNull List<Column> mColumns,
-            @Nullable Constraint mPrimaryKeyConstraint,
+            @Null Constraint mPrimaryKeyConstraint,
             @NotNull List<Constraint> mUniqueKeyConstraints
     ) {
         Parameters.requireNotNull(mName, "mName");

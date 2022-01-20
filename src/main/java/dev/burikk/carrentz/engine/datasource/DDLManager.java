@@ -6,7 +6,7 @@ import dev.burikk.carrentz.engine.entity.Entity;
 import dev.burikk.carrentz.engine.util.DataTypes;
 import dev.burikk.carrentz.engine.util.Models;
 import dev.burikk.carrentz.engine.util.Parameters;
-import com.sun.istack.internal.NotNull;
+import javax.validation.constraints.NotNull;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

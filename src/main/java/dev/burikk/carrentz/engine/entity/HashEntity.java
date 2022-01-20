@@ -3,8 +3,8 @@ package dev.burikk.carrentz.engine.entity;
 import dev.burikk.carrentz.engine.common.WynixResult;
 import dev.burikk.carrentz.engine.security.Crypt;
 import dev.burikk.carrentz.engine.util.Parameters;
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -23,7 +23,7 @@ import java.util.Map;
 public class HashEntity extends LinkedHashMap<String, Object> implements WynixResult {
     public void add(
             @NotNull String mKey,
-            @Nullable Object mValue
+            @Null Object mValue
     ) {
         Parameters.requireNotNull(mKey, "mKey");
 

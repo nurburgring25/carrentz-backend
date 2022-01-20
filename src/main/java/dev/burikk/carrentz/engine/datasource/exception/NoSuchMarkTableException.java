@@ -2,7 +2,7 @@ package dev.burikk.carrentz.engine.datasource.exception;
 
 import dev.burikk.carrentz.engine.entity.Entity;
 import dev.burikk.carrentz.engine.util.Parameters;
-import com.sun.istack.internal.NotNull;
+import javax.validation.constraints.NotNull;
 
 /**
  * @author Muhammad Irfan

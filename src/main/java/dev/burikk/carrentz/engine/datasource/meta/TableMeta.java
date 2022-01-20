@@ -3,8 +3,8 @@ package dev.burikk.carrentz.engine.datasource.meta;
 import dev.burikk.carrentz.engine.datasource.exception.NoSuchColumnException;
 import dev.burikk.carrentz.engine.datasource.exception.NoSuchConstraintException;
 import dev.burikk.carrentz.engine.util.Parameters;
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
@@ -24,9 +24,9 @@ public class TableMeta {
 
     TableMeta(
             @NotNull String mName,
-            @Nullable List<ColumnMeta> mColumnMetas,
-            @Nullable ConstraintMeta mPrimaryKeyConstraintMeta,
-            @Nullable List<ConstraintMeta> mUniqueKeyConstraintMetas
+            @Null List<ColumnMeta> mColumnMetas,
+            @Null ConstraintMeta mPrimaryKeyConstraintMeta,
+            @Null List<ConstraintMeta> mUniqueKeyConstraintMetas
     ) {
         Parameters.requireNotNull(mName, "mName");
 

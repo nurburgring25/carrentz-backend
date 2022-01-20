@@ -4,8 +4,8 @@ import dev.burikk.carrentz.engine.common.WynixResult;
 import dev.burikk.carrentz.engine.common.WynixResults;
 import dev.burikk.carrentz.engine.datasource.enumeration.JoinType;
 import dev.burikk.carrentz.engine.util.Parameters;
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.crypto.BadPaddingException;
@@ -50,7 +50,7 @@ public class DMLAssembler {
         this.mParameters = new ArrayList<>();
     }
 
-    private DMLAssembler() {}
+    public DMLAssembler() {}
 
     public DMLAssembler select(@NotNull String... mColumns) {
         Parameters.requireNotNull(mColumns, "mColumns");
@@ -497,7 +497,7 @@ public class DMLAssembler {
     }
 
     public <T extends WynixResult> WynixResults<T> getWynixResults(
-            @Nullable String mDataSourceName,
+            @Null String mDataSourceName,
             @NotNull Class<T> mClass
     ) throws SQLException, InstantiationException, IllegalAccessException, NamingException {
         Parameters.requireNotNull(mClass, "mClass");
@@ -514,7 +514,7 @@ public class DMLAssembler {
     }
 
     public <T extends WynixResult> T getWynixResult(
-            @Nullable String mDataSourceName,
+            @Null String mDataSourceName,
             @NotNull Class<T> mClass
     ) throws SQLException, InstantiationException, IllegalAccessException, NamingException {
         Parameters.requireNotNull(mClass, "mClass");
@@ -531,7 +531,7 @@ public class DMLAssembler {
     }
 
     public <T> List<T> getObjects(
-            @Nullable String mDataSourceName
+            @Null String mDataSourceName
     ) throws SQLException, NamingException {
         return DMLManager.getObjectsFromQuery(mDataSourceName, this.build(), this.mParameters.toArray());
     }
@@ -541,7 +541,7 @@ public class DMLAssembler {
     }
 
     public <T> T getObject(
-            @Nullable String mDataSourceName
+            @Null String mDataSourceName
     ) throws SQLException, NamingException {
         return DMLManager.getObjectFromQuery(mDataSourceName, this.build(), this.mParameters.toArray());
     }
@@ -551,7 +551,7 @@ public class DMLAssembler {
     }
 
     public <T> List<T> getEncryptedObjects(
-            @Nullable String mDataSourceName,
+            @Null String mDataSourceName,
             @NotNull Class<T> mType
     ) throws NoSuchPaddingException, BadPaddingException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, IllegalBlockSizeException, SQLException, NamingException, InvalidKeyException {
         return DMLManager.getEncryptedObjectsFromQuery(mDataSourceName, this.build(), mType, this.mParameters.toArray());
@@ -564,7 +564,7 @@ public class DMLAssembler {
     }
 
     public <T> T getEncryptedObject(
-            @Nullable String mDataSourceName,
+            @Null String mDataSourceName,
             @NotNull Class<T> mType
     ) throws NoSuchPaddingException, BadPaddingException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, IllegalBlockSizeException, SQLException, NamingException, InvalidKeyException {
         return DMLManager.getEncryptedObjectFromQuery(mDataSourceName, this.build(), mType, this.mParameters.toArray());

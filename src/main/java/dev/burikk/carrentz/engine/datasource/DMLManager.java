@@ -18,8 +18,8 @@ import dev.burikk.carrentz.engine.security.Crypt;
 import dev.burikk.carrentz.engine.util.DataTypes;
 import dev.burikk.carrentz.engine.util.Models;
 import dev.burikk.carrentz.engine.util.Parameters;
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -53,7 +53,7 @@ public class DMLManager extends SQLManager {
         super();
     }
 
-    private DMLManager(@NotNull String mDataSourceName) throws SQLException, NamingException {
+    public DMLManager(@NotNull String mDataSourceName) throws SQLException, NamingException {
         super(mDataSourceName);
     }
 
@@ -431,7 +431,7 @@ public class DMLManager extends SQLManager {
 
     public void execute(
             @NotNull String query,
-            @Nullable Object... parameters
+            @Null Object... parameters
     ) throws SQLException {
         Parameters.requireNotNull(query, "query");
 
@@ -462,7 +462,7 @@ public class DMLManager extends SQLManager {
 
     public static void executeImmediately(
             @NotNull String query,
-            @Nullable Object... parameters
+            @Null Object... parameters
     ) throws NamingException, SQLException {
         try (DMLManager dmlManager = new DMLManager()) {
             dmlManager.execute(query, parameters);
@@ -472,7 +472,7 @@ public class DMLManager extends SQLManager {
     @SafeVarargs
     @SuppressWarnings("StringBufferReplaceableByString")
     public static <T extends Entity> WynixResults<T> getWynixResults(
-            @Nullable String mDataSourceName,
+            @Null String mDataSourceName,
             @NotNull Class<T> mEntityClass,
             @NotNull Class<? extends Annotation>... mAnnotationClasses
     ) throws SQLException, InstantiationException, IllegalAccessException, NamingException {
@@ -657,10 +657,10 @@ public class DMLManager extends SQLManager {
 
     @SuppressWarnings("unchecked")
     public static <T extends WynixResult> WynixResults<T> getWynixResultsFromQuery(
-            @Nullable String mDataSourceName,
+            @Null String mDataSourceName,
             @NotNull String mQuery,
             @NotNull Class<T> mClass,
-            @Nullable Object... mParameters
+            @Null Object... mParameters
     ) throws SQLException, NamingException, IllegalAccessException, InstantiationException {
         Parameters.requireNotNull(mQuery, "mQuery");
         Parameters.requireNotNull(mClass, "mClass");
@@ -766,7 +766,7 @@ public class DMLManager extends SQLManager {
     public static <T extends WynixResult> WynixResults<T> getWynixResultsFromQuery(
             @NotNull String mQuery,
             @NotNull Class<T> mClass,
-            @Nullable Object... mParameters
+            @Null Object... mParameters
     ) throws SQLException, InstantiationException, IllegalAccessException, NamingException {
         return getWynixResultsFromQuery(null, mQuery, mClass, mParameters);
     }
@@ -780,10 +780,10 @@ public class DMLManager extends SQLManager {
 
     @SuppressWarnings("unchecked")
     public static <T extends WynixResult> T getWynixResultFromQuery(
-            @Nullable String mDataSourceName,
+            @Null String mDataSourceName,
             @NotNull String mQuery,
             @NotNull Class<T> mClass,
-            @Nullable Object... mParameters
+            @Null Object... mParameters
     ) throws SQLException, NamingException, IllegalAccessException, InstantiationException {
         Parameters.requireNotNull(mQuery, "mQuery");
         Parameters.requireNotNull(mClass, "mClass");
@@ -876,7 +876,7 @@ public class DMLManager extends SQLManager {
     public static <T extends WynixResult> T getWynixResultFromQuery(
             @NotNull String mQuery,
             @NotNull Class<T> mClass,
-            @Nullable Object... mParameters
+            @Null Object... mParameters
     ) throws SQLException, InstantiationException, IllegalAccessException, NamingException {
         return getWynixResultFromQuery(null, mQuery, mClass, mParameters);
     }
@@ -891,7 +891,7 @@ public class DMLManager extends SQLManager {
     @SuppressWarnings("StringBufferReplaceableByString")
     @SafeVarargs
     public static <T extends Entity> T getEntity(
-            @Nullable String mDataSourceName,
+            @Null String mDataSourceName,
             @NotNull Class<T> mClass,
             @NotNull Object mID,
             @NotNull Class<? extends Annotation>... mAnnotationClasses
@@ -1251,9 +1251,9 @@ public class DMLManager extends SQLManager {
 
     @SuppressWarnings("unchecked")
     public static <T> List<T> getObjectsFromQuery(
-            @Nullable String mDataSourceName,
+            @Null String mDataSourceName,
             @NotNull String mQuery,
-            @Nullable Object... mParameters
+            @Null Object... mParameters
     ) throws SQLException, NamingException {
         Parameters.requireNotNull(mQuery, "mQuery");
 
@@ -1289,17 +1289,17 @@ public class DMLManager extends SQLManager {
 
     public static <T> List<T> getObjectsFromQuery(
             @NotNull String mQuery,
-            @Nullable Object... mParameters
+            @Null Object... mParameters
     ) throws SQLException, NamingException {
         return getObjectsFromQuery(null, mQuery, mParameters);
     }
 
     @SuppressWarnings("unchecked")
     public static <T> List<T> getEncryptedObjectsFromQuery(
-            @Nullable String mDataSourceName,
+            @Null String mDataSourceName,
             @NotNull String mQuery,
             @NotNull Class<T> mType,
-            @Nullable Object... mParameters
+            @Null Object... mParameters
     ) throws SQLException, NamingException, NoSuchPaddingException, InvalidKeyException, NoSuchAlgorithmException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException {
         Parameters.requireNotNull(mQuery, "mQuery");
         Parameters.requireNotNull(mType, "mType");
@@ -1337,16 +1337,16 @@ public class DMLManager extends SQLManager {
     public static <T> List<T> getEncryptedObjectsFromQuery(
             @NotNull String mQuery,
             @NotNull Class<T> mType,
-            @Nullable Object... mParameters
+            @Null Object... mParameters
     ) throws NoSuchPaddingException, BadPaddingException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, IllegalBlockSizeException, SQLException, NamingException, InvalidKeyException {
         return getEncryptedObjectsFromQuery(null, mQuery, mType, mParameters);
     }
 
     @SuppressWarnings("unchecked")
     private static <T> T getObjectFromQuery(
-            @Nullable String mDataSourceName,
+            @Null String mDataSourceName,
             @NotNull String mQuery,
-            @Nullable Object... mParameters
+            @Null Object... mParameters
     ) throws SQLException, NamingException {
         Parameters.requireNotNull(mQuery, "mQuery");
 
@@ -1380,17 +1380,17 @@ public class DMLManager extends SQLManager {
 
     public static <T> T getObjectFromQuery(
             @NotNull String mQuery,
-            @Nullable Object... mParameters
+            @Null Object... mParameters
     ) throws SQLException, NamingException {
         return getObjectFromQuery(null, mQuery, mParameters);
     }
 
     @SuppressWarnings("unchecked")
     public static <T> T getEncryptedObjectFromQuery(
-            @Nullable String mDataSourceName,
+            @Null String mDataSourceName,
             @NotNull String mQuery,
             @NotNull Class<T> mType,
-            @Nullable Object... mParameters
+            @Null Object... mParameters
     ) throws SQLException, NamingException, NoSuchPaddingException, InvalidKeyException, NoSuchAlgorithmException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException {
         Parameters.requireNotNull(mQuery, "mQuery");
         Parameters.requireNotNull(mType, "mType");
@@ -1426,7 +1426,7 @@ public class DMLManager extends SQLManager {
     public static <T> T getEncryptedObjectFromQuery(
             @NotNull String mQuery,
             @NotNull Class<T> mType,
-            @Nullable Object... mParameters
+            @Null Object... mParameters
     ) throws NoSuchPaddingException, BadPaddingException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, IllegalBlockSizeException, SQLException, NamingException, InvalidKeyException {
         return getEncryptedObjectFromQuery(null, mQuery, mType, mParameters);
     }

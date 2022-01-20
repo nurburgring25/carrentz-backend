@@ -3,7 +3,7 @@ package dev.burikk.carrentz.engine.datasource.meta;
 import dev.burikk.carrentz.engine.common.Constant;
 import dev.burikk.carrentz.engine.datasource.exception.NoSuchTableException;
 import dev.burikk.carrentz.engine.util.Parameters;
-import com.sun.istack.internal.NotNull;
+import javax.validation.constraints.NotNull;
 
 import java.sql.Connection;
 import java.sql.JDBCType;

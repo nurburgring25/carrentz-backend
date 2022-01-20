@@ -4,8 +4,8 @@ import dev.burikk.carrentz.engine.datasource.annotation.MarkReferencedColumn;
 import dev.burikk.carrentz.engine.datasource.exception.NoSuchMarkReferencedColumnException;
 import dev.burikk.carrentz.engine.entity.Entity;
 import dev.burikk.carrentz.engine.util.Parameters;
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 
 import java.lang.reflect.Field;
 import java.sql.JDBCType;
@@ -26,7 +26,7 @@ public class ReferencedColumn extends BaseColumn {
             @NotNull Field mField,
             @NotNull JDBCType mJDBCType,
             int mReferenceID,
-            @Nullable String mAliasName
+            @Null String mAliasName
     ) {
         super(mName, mJDBCType, mField);
 

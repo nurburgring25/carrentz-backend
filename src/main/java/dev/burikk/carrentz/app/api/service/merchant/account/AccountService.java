@@ -4,6 +4,7 @@ import dev.burikk.carrentz.app.api.service.merchant.account.request.RegisterRequ
 import dev.burikk.carrentz.app.entity.MerchantEntity;
 import dev.burikk.carrentz.app.entity.OwnerEntity;
 import dev.burikk.carrentz.app.entity.StoreEntity;
+import dev.burikk.carrentz.engine.common.SessionManager;
 import dev.burikk.carrentz.engine.datasource.DMLManager;
 import dev.burikk.carrentz.engine.security.Digest;
 
@@ -18,19 +19,22 @@ import javax.ws.rs.core.Response;
  * @author Muhammad Irfan
  * @since 19/01/2022 12.27
  */
-@Path("/api/merchants/")
+@Path("/merchants/")
 public class AccountService {
     @POST
     @Path("/register")
     @PermitAll
     @Consumes(MediaType.APPLICATION_JSON)
     public Response register(RegisterRequest registerRequest) throws Exception {
+        SessionManager.getInstance().createSystemSession();
+
         try (DMLManager dmlManager = new DMLManager()) {
             dmlManager.begin();
 
             // Masukkan data merchant
             MerchantEntity merchantEntity = new MerchantEntity();
 
+            merchantEntity.markNew();
             merchantEntity.setName(registerRequest.getBusinessName());
 
             Long merchantId = dmlManager.store(merchantEntity);
@@ -38,6 +42,7 @@ public class AccountService {
             // Masukkan data cabang
             StoreEntity storeEntity = new StoreEntity();
 
+            storeEntity.markNew();
             storeEntity.setMerchantId(merchantId);
             storeEntity.setName(registerRequest.getBusinessName());
             storeEntity.setPhoneNumber(registerRequest.getPhoneNumber());
@@ -47,6 +52,7 @@ public class AccountService {
             // Masukkan data pemilik
             OwnerEntity ownerEntity = new OwnerEntity();
 
+            ownerEntity.markNew();
             ownerEntity.setMerchantId(merchantId);
             ownerEntity.setId(registerRequest.getEmail());
             ownerEntity.setPassword(Digest.MD5(registerRequest.getEmail(), registerRequest.getPassword()));

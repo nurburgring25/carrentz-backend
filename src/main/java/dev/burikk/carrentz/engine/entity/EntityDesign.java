@@ -13,7 +13,7 @@ import dev.burikk.carrentz.engine.entity.annotation.MarkDeletable;
 import dev.burikk.carrentz.engine.entity.annotation.MarkDescription;
 import dev.burikk.carrentz.engine.util.Models;
 import dev.burikk.carrentz.engine.util.Parameters;
-import com.sun.istack.internal.NotNull;
+import javax.validation.constraints.NotNull;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Field;

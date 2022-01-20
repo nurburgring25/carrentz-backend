@@ -3,7 +3,7 @@ package dev.burikk.carrentz.engine.entity;
 import dev.burikk.carrentz.engine.datasource.Column;
 import dev.burikk.carrentz.engine.datasource.ReferencedColumn;
 import dev.burikk.carrentz.engine.util.Parameters;
-import com.sun.istack.internal.NotNull;
+import javax.validation.constraints.NotNull;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -26,7 +26,7 @@ public class EntityCache {
         this.mMap = new HashMap<>();
     }
 
-    private EntityCache() {}
+    public EntityCache() {}
 
     public static EntityCache getInstance() {
         return INSTANCE;
