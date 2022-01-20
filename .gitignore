@@ -1,2 +1,7 @@
 # Project exclude paths
 /target/
+/.idea/vcs.xml
+/.idea/runConfigurations.xml
+/.idea/
+/backend.iml
+/carrentz-backend.iml
