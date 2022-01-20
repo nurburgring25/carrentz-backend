@@ -23,7 +23,7 @@
 
   <servlet-mapping>
     <servlet-name>API</servlet-name>
-    <url-pattern>/rest/*</url-pattern>
+    <url-pattern>/api/*</url-pattern>
   </servlet-mapping>
 
   <error-page>

@@ -41,7 +41,6 @@ public class Entity implements WynixResult, Serializable, Cloneable {
             isNotNull = true,
             defaultValue = "NOW()"
     )
-    @MarkDescription(value = "Created", visible = false)
     private LocalDateTime created;
 
     @MarkColumn(
@@ -50,7 +49,6 @@ public class Entity implements WynixResult, Serializable, Cloneable {
             maxLength = 32,
             isNotNull = true
     )
-    @MarkDescription(value = "Creator", visible = false)
     private String creator;
 
     @MarkColumn(
@@ -58,7 +56,6 @@ public class Entity implements WynixResult, Serializable, Cloneable {
             jdbcType = JDBCType.TIMESTAMP,
             defaultValue = "NOW()"
     )
-    @MarkDescription(value = "Modified", visible = false)
     private LocalDateTime modified;
 
     @MarkColumn(
@@ -66,7 +63,6 @@ public class Entity implements WynixResult, Serializable, Cloneable {
             jdbcType = JDBCType.VARCHAR,
             maxLength = 32
     )
-    @MarkDescription(value = "Modificator", visible = false)
     private String modificator;
 
     @MarkColumn(
@@ -75,7 +71,6 @@ public class Entity implements WynixResult, Serializable, Cloneable {
             isNotNull = true,
             defaultValue = "FALSE"
     )
-    @MarkDescription(value = "Deleted", used = false)
     private boolean deleted;
     //</editor-fold>
 

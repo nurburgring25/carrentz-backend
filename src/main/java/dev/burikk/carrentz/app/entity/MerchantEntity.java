@@ -3,7 +3,6 @@ package dev.burikk.carrentz.app.entity;
 import dev.burikk.carrentz.engine.datasource.annotation.*;
 import dev.burikk.carrentz.engine.entity.Entity;
 import dev.burikk.carrentz.engine.entity.annotation.MarkAuditable;
-import dev.burikk.carrentz.engine.entity.annotation.MarkDescription;
 
 import java.sql.JDBCType;
 
@@ -31,7 +30,6 @@ public class MerchantEntity extends Entity {
             maxLength = 64,
             isNotNull = true
     )
-    @MarkDescription("name")
     private String name;
 
     @MarkColumn(

@@ -1,5 +1,8 @@
 package dev.burikk.carrentz.app;
 
+import dev.burikk.carrentz.app.api.filter.AuthenticationFilter;
+import dev.burikk.carrentz.app.api.filter.LogFilter;
+import dev.burikk.carrentz.app.api.service.merchant.account.AccountService;
 import dev.burikk.carrentz.engine.api.common.CustomParamConverterProvider;
 import dev.burikk.carrentz.engine.api.common.JacksonConfigurator;
 import dev.burikk.carrentz.engine.api.exception.mapper.GeneralExceptionMapper;
@@ -54,6 +57,11 @@ public class Igniter extends Application {
 
         classes.add(CustomParamConverterProvider.class);
         classes.add(GeneralExceptionMapper.class);
+
+        classes.add(LogFilter.class);
+        classes.add(AuthenticationFilter.class);
+
+        classes.add(AccountService.class);
 
         return classes;
     }

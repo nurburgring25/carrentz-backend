@@ -50,9 +50,11 @@ public class Constant {
             LogEntity.class,
             MerchantEntity.class,
             OwnerEntity.class,
+            OwnerSessionEntity.class,
             RentEntity.class,
             StoreEntity.class,
             UserEntity.class,
+            UserSessionEntity.class,
             VehicleEntity.class,
             VehicleImageEntity.class,
             VehicleTypeEntity.class
