@@ -1,6 +1,7 @@
 package dev.burikk.carrentz.app.entity;
 
 import dev.burikk.carrentz.engine.datasource.annotation.*;
+import dev.burikk.carrentz.engine.datasource.enumeration.JoinType;
 import dev.burikk.carrentz.engine.entity.Entity;
 import dev.burikk.carrentz.engine.entity.annotation.MarkAuditable;
 
@@ -15,6 +16,8 @@ import java.sql.JDBCType;
 @MarkTable("vehicles")
 @PrimaryKeyConstraint("vehicles_pk")
 @UniqueKeyConstraint(id = 1, value = "vehicles_uk")
+@Reference(id = 1, sourceColumn = "store_id", targetTable = "stores", joinType = JoinType.INNER_JOIN)
+@Reference(id = 2, sourceColumn = "vehicle_type_id", targetTable = "vehicle_types", joinType = JoinType.INNER_JOIN)
 public class VehicleEntity extends Entity {
     @PrimaryKey
     @MarkColumn(
@@ -33,6 +36,14 @@ public class VehicleEntity extends Entity {
     )
     private Long storeId;
 
+    @MarkReferencedColumn(
+            value = "name",
+            jdbcType = JDBCType.VARCHAR,
+            referenceID = 1,
+            alias = "store_name"
+    )
+    private String storeName;
+
     @MarkColumn(
             value = "vehicle_type_id",
             jdbcType = JDBCType.BIGINT,
@@ -41,6 +52,14 @@ public class VehicleEntity extends Entity {
             tableReference = "vehicle_types"
     )
     private Long vehicleTypeId;
+
+    @MarkReferencedColumn(
+            value = "name",
+            jdbcType = JDBCType.VARCHAR,
+            referenceID = 2,
+            alias = "vehicle_type_name"
+    )
+    private String vehicleTypeName;
 
     @UniqueKey(1)
     @MarkColumn(
@@ -82,7 +101,7 @@ public class VehicleEntity extends Entity {
     private BigDecimal lateReturnFinePerDay;
 
     public Long getId() {
-        return this.id;
+        return id;
     }
 
     public void setId(Long id) {
@@ -90,23 +109,39 @@ public class VehicleEntity extends Entity {
     }
 
     public Long getStoreId() {
-        return this.storeId;
+        return storeId;
     }
 
     public void setStoreId(Long storeId) {
         this.storeId = storeId;
     }
 
+    public String getStoreName() {
+        return storeName;
+    }
+
+    public void setStoreName(String storeName) {
+        this.storeName = storeName;
+    }
+
     public Long getVehicleTypeId() {
-        return this.vehicleTypeId;
+        return vehicleTypeId;
     }
 
     public void setVehicleTypeId(Long vehicleTypeId) {
         this.vehicleTypeId = vehicleTypeId;
     }
 
+    public String getVehicleTypeName() {
+        return vehicleTypeName;
+    }
+
+    public void setVehicleTypeName(String vehicleTypeName) {
+        this.vehicleTypeName = vehicleTypeName;
+    }
+
     public String getLicenseNumber() {
-        return this.licenseNumber;
+        return licenseNumber;
     }
 
     public void setLicenseNumber(String licenseNumber) {
@@ -114,7 +149,7 @@ public class VehicleEntity extends Entity {
     }
 
     public String getName() {
-        return this.name;
+        return name;
     }
 
     public void setName(String name) {
@@ -122,7 +157,7 @@ public class VehicleEntity extends Entity {
     }
 
     public String getDescription() {
-        return this.description;
+        return description;
     }
 
     public void setDescription(String description) {
@@ -130,7 +165,7 @@ public class VehicleEntity extends Entity {
     }
 
     public BigDecimal getCostPerDay() {
-        return this.costPerDay;
+        return costPerDay;
     }
 
     public void setCostPerDay(BigDecimal costPerDay) {
@@ -138,7 +173,7 @@ public class VehicleEntity extends Entity {
     }
 
     public BigDecimal getLateReturnFinePerDay() {
-        return this.lateReturnFinePerDay;
+        return lateReturnFinePerDay;
     }
 
     public void setLateReturnFinePerDay(BigDecimal lateReturnFinePerDay) {
