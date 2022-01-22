@@ -67,6 +67,8 @@ public class Igniter extends Application {
         classes.add(StoreService.class);
         classes.add(VehicleService.class);
 
+        classes.add(dev.burikk.carrentz.app.api.service.user.account.AccountService.class);
+
         return classes;
     }
 }
