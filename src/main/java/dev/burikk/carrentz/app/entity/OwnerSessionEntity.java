@@ -37,6 +37,7 @@ public class OwnerSessionEntity extends Entity implements WynixSession {
     @MarkColumn(
             value = "owner_id",
             jdbcType = JDBCType.VARCHAR,
+            maxLength = 64,
             isNotNull = true,
             columnReference = "id",
             tableReference = "owners"

@@ -27,6 +27,7 @@ public class RentEntity extends Entity {
     @MarkColumn(
             value = "user_id",
             jdbcType = JDBCType.VARCHAR,
+            maxLength = 64,
             isNotNull = true,
             columnReference = "id",
             tableReference = "users"
