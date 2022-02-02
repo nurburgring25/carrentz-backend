@@ -2,6 +2,7 @@ package dev.burikk.carrentz.app.entity;
 
 import dev.burikk.carrentz.app.common.CustomConstant;
 import dev.burikk.carrentz.engine.datasource.annotation.*;
+import dev.burikk.carrentz.engine.datasource.enumeration.JoinType;
 import dev.burikk.carrentz.engine.entity.Entity;
 import dev.burikk.carrentz.engine.entity.annotation.MarkAuditable;
 
@@ -15,6 +16,7 @@ import java.sql.JDBCType;
 @MarkTable("stores")
 @PrimaryKeyConstraint("stores_pk")
 @UniqueKeyConstraint(id = 1, value = "store_name_uk")
+@Reference(id = 1, sourceColumn = "merchant_id", targetTable = "merchants", joinType = JoinType.INNER_JOIN)
 public class StoreEntity extends Entity {
     @PrimaryKey
     @MarkColumn(
@@ -33,6 +35,14 @@ public class StoreEntity extends Entity {
             tableReference = "merchants"
     )
     private Long merchantId;
+
+    @MarkReferencedColumn(
+            value = "name",
+            jdbcType = JDBCType.VARCHAR,
+            referenceID = 1,
+            alias = "merchant_name"
+    )
+    private String merchantName;
 
     @UniqueKey(1)
     @MarkColumn(
@@ -81,6 +91,14 @@ public class StoreEntity extends Entity {
 
     public void setMerchantId(Long merchantId) {
         this.merchantId = merchantId;
+    }
+
+    public String getMerchantName() {
+        return merchantName;
+    }
+
+    public void setMerchantName(String merchantName) {
+        this.merchantName = merchantName;
     }
 
     public String getName() {

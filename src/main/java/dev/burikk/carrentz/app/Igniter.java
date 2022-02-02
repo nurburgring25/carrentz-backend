@@ -5,6 +5,10 @@ import dev.burikk.carrentz.app.api.filter.LogFilter;
 import dev.burikk.carrentz.app.api.service.merchant.account.AccountService;
 import dev.burikk.carrentz.app.api.service.merchant.store.StoreService;
 import dev.burikk.carrentz.app.api.service.merchant.vehicle.VehicleService;
+import dev.burikk.carrentz.app.api.service.user.general.GeneralService;
+import dev.burikk.carrentz.app.api.service.user.home.HomeService;
+import dev.burikk.carrentz.app.api.service.user.store.UserStoreService;
+import dev.burikk.carrentz.app.api.service.user.vehicle.UserVehicleService;
 import dev.burikk.carrentz.engine.api.common.CustomParamConverterProvider;
 import dev.burikk.carrentz.engine.api.common.JacksonConfigurator;
 import dev.burikk.carrentz.engine.api.exception.mapper.GeneralExceptionMapper;
@@ -63,11 +67,15 @@ public class Igniter extends Application {
         classes.add(LogFilter.class);
         classes.add(AuthenticationFilter.class);
 
+        classes.add(GeneralService.class);
         classes.add(AccountService.class);
         classes.add(StoreService.class);
         classes.add(VehicleService.class);
 
         classes.add(dev.burikk.carrentz.app.api.service.user.account.AccountService.class);
+        classes.add(HomeService.class);
+        classes.add(UserStoreService.class);
+        classes.add(UserVehicleService.class);
 
         return classes;
     }

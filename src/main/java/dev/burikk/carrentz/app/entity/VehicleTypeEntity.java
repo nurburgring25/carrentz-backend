@@ -30,6 +30,13 @@ public class VehicleTypeEntity extends Entity {
     )
     private String name;
 
+    @MarkColumn(
+            value = "image",
+            jdbcType = JDBCType.VARCHAR,
+            maxLength = 64
+    )
+    private String image;
+
     public Long getId() {
         return this.id;
     }
@@ -44,5 +51,13 @@ public class VehicleTypeEntity extends Entity {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 }
