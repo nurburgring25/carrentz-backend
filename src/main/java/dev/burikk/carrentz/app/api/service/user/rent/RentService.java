@@ -9,6 +9,7 @@ import dev.burikk.carrentz.engine.common.WynixResults;
 import dev.burikk.carrentz.engine.datasource.DMLAssembler;
 import dev.burikk.carrentz.engine.datasource.DMLManager;
 import dev.burikk.carrentz.engine.entity.HashEntity;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
@@ -55,10 +56,11 @@ public class RentService {
             rentEntity.markNew();
             rentEntity.setUserId(SessionManager.getInstance().getWynixUser().getIdentity());
             rentEntity.setVehicleId(rentRequest.getVehicleId());
+            rentEntity.setNumber("TRX-" + StringUtils.upperCase(Long.toHexString(System.nanoTime())));
             rentEntity.setStatus(Constant.DocumentStatus.OPENED);
             rentEntity.setStart(rentRequest.getStart());
             rentEntity.setUntil(rentRequest.getUntil());
-            rentEntity.setDuration(Period.between(rentEntity.getStart(), rentEntity.getUntil()).getDays());
+            rentEntity.setDuration(Period.between(rentEntity.getStart(), rentEntity.getUntil()).getDays() + 1);
             rentEntity.setCostPerDay(vehicleEntity.getCostPerDay());
             rentEntity.setTotal(vehicleEntity.getCostPerDay().multiply(new BigDecimal(rentEntity.getDuration())));
 

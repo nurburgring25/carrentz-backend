@@ -44,6 +44,14 @@ public class RentEntity extends Entity {
     private Long vehicleId;
 
     @MarkColumn(
+            value = "number",
+            jdbcType = JDBCType.VARCHAR,
+            maxLength = 16,
+            isNotNull = true
+    )
+    private String number;
+
+    @MarkColumn(
             value = "status",
             jdbcType = JDBCType.VARCHAR,
             maxLength = 16,
@@ -132,6 +140,14 @@ public class RentEntity extends Entity {
 
     public void setVehicleId(Long vehicleId) {
         this.vehicleId = vehicleId;
+    }
+
+    public String getNumber() {
+        return number;
+    }
+
+    public void setNumber(String number) {
+        this.number = number;
     }
 
     public String getStatus() {
