@@ -88,29 +88,25 @@ public class RentEntity extends Entity {
 
     @MarkColumn(
             value = "return_at",
-            jdbcType = JDBCType.DATE,
-            isNotNull = true
+            jdbcType = JDBCType.DATE
     )
     private LocalDate returnAt;
 
     @MarkColumn(
             value = "late_return_duration",
-            jdbcType = JDBCType.INTEGER,
-            isNotNull = true
+            jdbcType = JDBCType.INTEGER
     )
     private Integer late_return_duration;
 
     @MarkColumn(
             value = "late_return_fine_per_day",
-            jdbcType = JDBCType.NUMERIC,
-            isNotNull = true
+            jdbcType = JDBCType.NUMERIC
     )
     private BigDecimal lateReturnFinePerDay;
 
     @MarkColumn(
             value = "late_return_fine",
-            jdbcType = JDBCType.NUMERIC,
-            isNotNull = true
+            jdbcType = JDBCType.NUMERIC
     )
     private BigDecimal lateReturnFine;
 

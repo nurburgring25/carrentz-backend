@@ -45,6 +45,13 @@ public class Constant {
         public static final String FIELD_DELETED = "deleted";
     }
 
+    public static class DocumentStatus {
+        public static final String OPENED = "OPENED";
+        public static final String ONGOING = "ONGOING";
+        public static final String CLOSED = "CLOSED";
+        public static final String CANCELLED = "CANCELLED";
+    }
+
     public static List<Class<? extends Entity>> ENTITY_CLASSES = Arrays.asList(
             ConfigurationEntity.class,
             LogEntity.class,

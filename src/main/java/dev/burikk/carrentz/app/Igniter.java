@@ -7,6 +7,7 @@ import dev.burikk.carrentz.app.api.service.merchant.store.StoreService;
 import dev.burikk.carrentz.app.api.service.merchant.vehicle.VehicleService;
 import dev.burikk.carrentz.app.api.service.user.general.GeneralService;
 import dev.burikk.carrentz.app.api.service.user.home.HomeService;
+import dev.burikk.carrentz.app.api.service.user.rent.RentService;
 import dev.burikk.carrentz.app.api.service.user.store.UserStoreService;
 import dev.burikk.carrentz.app.api.service.user.vehicle.UserVehicleService;
 import dev.burikk.carrentz.engine.api.common.CustomParamConverterProvider;
@@ -76,6 +77,7 @@ public class Igniter extends Application {
         classes.add(HomeService.class);
         classes.add(UserStoreService.class);
         classes.add(UserVehicleService.class);
+        classes.add(RentService.class);
 
         return classes;
     }
