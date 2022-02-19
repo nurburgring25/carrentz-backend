@@ -31,6 +31,10 @@ public class RentService {
         WynixResults<HashEntity> hashEntities = DMLAssembler
                 .create()
                 .getWynixResults(HashEntity.class);
+
+        return Response
+                .ok()
+                .build();
     }
 
     @POST
