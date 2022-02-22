@@ -11,7 +11,10 @@ import dev.burikk.carrentz.app.entity.StoreEntity;
 import dev.burikk.carrentz.engine.common.Constant;
 import dev.burikk.carrentz.engine.common.SessionManager;
 import dev.burikk.carrentz.engine.common.TimeManager;
+import dev.burikk.carrentz.engine.datasource.DMLAssembler;
 import dev.burikk.carrentz.engine.datasource.DMLManager;
+import dev.burikk.carrentz.engine.datasource.enumeration.JoinType;
+import dev.burikk.carrentz.engine.entity.HashEntity;
 import dev.burikk.carrentz.engine.security.Crypt;
 import dev.burikk.carrentz.engine.security.Digest;
 import dev.burikk.carrentz.engine.util.Validators;
@@ -93,18 +96,25 @@ public class AccountService {
         try (DMLManager dmlManager = new DMLManager()) {
             dmlManager.begin();
 
-            OwnerEntity ownerEntity = DMLManager.getWynixResultFromQuery(
-                    "SELECT * FROM owners WHERE id = ?",
-                    OwnerEntity.class,
-                    signInRequest.getEmail()
-            );
+            HashEntity hashEntity = DMLAssembler
+                    .create()
+                    .select("a.id AS id")
+                    .select("a.name AS name")
+                    .select("b.id AS merchant_id")
+                    .select("b.name AS merchant_name")
+                    .from("owners a")
+                    .join("merchants b ON b.id = a.merchant_id", JoinType.INNER_JOIN)
+                    .equalTo("a.id", signInRequest.getEmail())
+                    .getWynixResult(HashEntity.class);
 
-            Validators.validate(ownerEntity, "Email tidak dapat ditemukan.");
+            Validators.validate(hashEntity, "Email tidak dapat ditemukan.");
 
             SignInResponse signInResponse = new SignInResponse();
 
-            signInResponse.setEmail(ownerEntity.getId());
-            signInResponse.setName(ownerEntity.getName());
+            signInResponse.setEmail(hashEntity.get("id"));
+            signInResponse.setName(hashEntity.get("name"));
+            signInResponse.setMerchantId(hashEntity.get("merchant_id"));
+            signInResponse.setMerchantName(hashEntity.get("merchant_name"));
 
             return Response
                     .ok(signInResponse)
