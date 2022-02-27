@@ -1,6 +1,11 @@
 package dev.burikk.carrentz.app.api.service.user.rent;
 
+import dev.burikk.carrentz.app.api.service.user.rent.item.UserRentItem;
+import dev.burikk.carrentz.app.api.service.user.rent.item.UserRentStoreItem;
+import dev.burikk.carrentz.app.api.service.user.rent.item.UserRentUserItem;
+import dev.burikk.carrentz.app.api.service.user.rent.item.UserRentVehicleItem;
 import dev.burikk.carrentz.app.api.service.user.rent.request.RentRequest;
+import dev.burikk.carrentz.app.api.service.user.rent.response.UserRentListResponse;
 import dev.burikk.carrentz.app.entity.RentEntity;
 import dev.burikk.carrentz.app.entity.VehicleEntity;
 import dev.burikk.carrentz.engine.common.Constant;
@@ -8,6 +13,7 @@ import dev.burikk.carrentz.engine.common.SessionManager;
 import dev.burikk.carrentz.engine.common.WynixResults;
 import dev.burikk.carrentz.engine.datasource.DMLAssembler;
 import dev.burikk.carrentz.engine.datasource.DMLManager;
+import dev.burikk.carrentz.engine.datasource.enumeration.JoinType;
 import dev.burikk.carrentz.engine.entity.HashEntity;
 import org.apache.commons.lang3.StringUtils;
 
@@ -29,12 +35,84 @@ public class RentService {
     @RolesAllowed("UserEntity")
     @Produces(MediaType.APPLICATION_JSON)
     public Response get() throws Exception {
+        UserRentListResponse userRentListResponse = new UserRentListResponse();
+
         WynixResults<HashEntity> hashEntities = DMLAssembler
                 .create()
+                .select("a.id AS id")
+                .select("b.id AS user_id")
+                .select("b.name AS user_name")
+                .select("b.phone_number AS phone_number")
+                .select("c.id AS vehicle_id")
+                .select("e.name AS vehicle_type")
+                .select("c.license_number AS license_number")
+                .select("c.name AS vehicle_name")
+                .select("d.id AS store_id")
+                .select("d.name AS store_name")
+                .select("a.number AS number")
+                .select("a.status AS status")
+                .select("a.start AS start")
+                .select("a.until AS until")
+                .select("a.duration AS duration")
+                .select("a.cost_per_day AS cost_per_day")
+                .select("a.total AS total")
+                .from("rents a")
+                .join("users b ON b.id = a.user_id", JoinType.INNER_JOIN)
+                .join("vehicles c ON c.id = a.vehicle_id", JoinType.INNER_JOIN)
+                .join("stores d ON d.id = c.store_id", JoinType.INNER_JOIN)
+                .join("vehicle_types e ON e.id = c.vehicle_type_id", JoinType.INNER_JOIN)
+                .equalTo("b.id", SessionManager.getInstance().getWynixUser().getIdentity())
+                .desc("a.start")
                 .getWynixResults(HashEntity.class);
 
+        for (HashEntity hashEntity : hashEntities) {
+            UserRentItem userRentItem = new UserRentItem();
+
+            userRentItem.setId(hashEntity.get("id"));
+
+            {
+                UserRentUserItem userRentUserItem = new UserRentUserItem();
+
+                userRentUserItem.setId(hashEntity.get("user_id"));
+                userRentUserItem.setName(hashEntity.get("user_name"));
+                userRentUserItem.setPhoneNumber(hashEntity.get("phone_number"));
+
+                userRentItem.setUser(userRentUserItem);
+            }
+
+            {
+                UserRentVehicleItem userRentVehicleItem = new UserRentVehicleItem();
+
+                userRentVehicleItem.setId(hashEntity.get("vehicle_id"));
+                userRentVehicleItem.setVehicleType(hashEntity.get("vehicle_type"));
+                userRentVehicleItem.setLicenseNumber(hashEntity.get("license_number"));
+                userRentVehicleItem.setName(hashEntity.get("vehicle_name"));
+
+                userRentItem.setVehicle(userRentVehicleItem);
+            }
+
+            {
+                UserRentStoreItem userRentStoreItem = new UserRentStoreItem();
+
+                userRentStoreItem.setId(hashEntity.get("store_id"));
+                userRentStoreItem.setName(hashEntity.get("store_name"));
+
+                userRentItem.setStore(userRentStoreItem);
+            }
+
+            userRentItem.setNumber(hashEntity.get("number"));
+            userRentItem.setStatus(hashEntity.get("status"));
+            userRentItem.setStart(hashEntity.get("start"));
+            userRentItem.setUntil(hashEntity.get("until"));
+            userRentItem.setDuration(hashEntity.get("duration"));
+            userRentItem.setCostPerDay(hashEntity.get("cost_per_day"));
+            userRentItem.setTotal(hashEntity.get("total"));
+
+            userRentListResponse.getDetails().add(userRentItem);
+        }
+
         return Response
-                .ok()
+                .ok(userRentListResponse)
                 .build();
     }
 
