@@ -104,7 +104,7 @@ public class RentEntity extends Entity {
             value = "late_return_duration",
             jdbcType = JDBCType.INTEGER
     )
-    private Integer late_return_duration;
+    private Integer lateReturnDuration;
 
     @MarkColumn(
             value = "late_return_fine_per_day",
@@ -117,6 +117,20 @@ public class RentEntity extends Entity {
             jdbcType = JDBCType.NUMERIC
     )
     private BigDecimal lateReturnFine;
+
+    @MarkColumn(
+            value = "rent_code",
+            jdbcType = JDBCType.VARCHAR,
+            maxLength = 4
+    )
+    private String rentCode;
+
+    @MarkColumn(
+            value = "return_code",
+            jdbcType = JDBCType.VARCHAR,
+            maxLength = 4
+    )
+    private String returnCode;
 
     public Long getId() {
         return this.id;
@@ -206,12 +220,12 @@ public class RentEntity extends Entity {
         this.returnAt = returnAt;
     }
 
-    public Integer getLate_return_duration() {
-        return this.late_return_duration;
+    public Integer getLateReturnDuration() {
+        return lateReturnDuration;
     }
 
-    public void setLate_return_duration(Integer late_return_duration) {
-        this.late_return_duration = late_return_duration;
+    public void setLateReturnDuration(Integer lateReturnDuration) {
+        this.lateReturnDuration = lateReturnDuration;
     }
 
     public BigDecimal getLateReturnFinePerDay() {
@@ -228,5 +242,21 @@ public class RentEntity extends Entity {
 
     public void setLateReturnFine(BigDecimal lateReturnFine) {
         this.lateReturnFine = lateReturnFine;
+    }
+
+    public String getRentCode() {
+        return rentCode;
+    }
+
+    public void setRentCode(String rentCode) {
+        this.rentCode = rentCode;
+    }
+
+    public String getReturnCode() {
+        return returnCode;
+    }
+
+    public void setReturnCode(String returnCode) {
+        this.returnCode = returnCode;
     }
 }

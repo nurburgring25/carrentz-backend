@@ -15,6 +15,7 @@ import dev.burikk.carrentz.engine.datasource.DMLAssembler;
 import dev.burikk.carrentz.engine.datasource.DMLManager;
 import dev.burikk.carrentz.engine.datasource.enumeration.JoinType;
 import dev.burikk.carrentz.engine.entity.HashEntity;
+import dev.burikk.carrentz.engine.exception.WynixException;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.security.RolesAllowed;
@@ -22,7 +23,9 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.Period;
+import java.time.temporal.ChronoUnit;
 
 /**
  * @author Muhammad Irfan
@@ -134,11 +137,11 @@ public class RentService {
             rentEntity.markNew();
             rentEntity.setUserId(SessionManager.getInstance().getWynixUser().getIdentity());
             rentEntity.setVehicleId(rentRequest.getVehicleId());
-            rentEntity.setNumber("TRX-" + StringUtils.upperCase(Long.toHexString(System.nanoTime())));
+            rentEntity.setNumber("TRX-" + StringUtils.upperCase(Long.toHexString(System.currentTimeMillis())));
             rentEntity.setStatus(Constant.DocumentStatus.OPENED);
             rentEntity.setStart(rentRequest.getStart());
             rentEntity.setUntil(rentRequest.getUntil());
-            rentEntity.setDuration(Period.between(rentEntity.getStart(), rentEntity.getUntil()).getDays() + 1);
+            rentEntity.setDuration((int) (ChronoUnit.DAYS.between(rentEntity.getStart(), rentEntity.getUntil()) + 1));
             rentEntity.setCostPerDay(vehicleEntity.getCostPerDay());
             rentEntity.setTotal(vehicleEntity.getCostPerDay().multiply(new BigDecimal(rentEntity.getDuration())));
 
@@ -148,7 +151,79 @@ public class RentService {
                     .ok()
                     .build();
         } else {
-            throw new Exception("Mobil dengan id " + rentRequest.getVehicleId() + " tidak dapat ditemukan.");
+            throw new WynixException("Mobil dengan id " + rentRequest.getVehicleId() + " tidak dapat ditemukan.");
         }
+    }
+
+    @GET
+    @Path("/rents/{id}/take-the-car")
+    @RolesAllowed("UserEntity")
+    public Response takeTheCar (
+            @PathParam("id") Long id,
+            @QueryParam("code") String code
+    ) throws Exception {
+        RentEntity rentEntity = DMLManager.getEntity(RentEntity.class, id);
+
+        if (rentEntity != null) {
+            if (StringUtils.equals(rentEntity.getRentCode(), code)) {
+                rentEntity.markUpdate();
+                rentEntity.setStatus(Constant.DocumentStatus.ONGOING);
+
+                DMLManager.storeImmediately(rentEntity);
+
+                return Response
+                        .ok()
+                        .build();
+            } else {
+                throw new WynixException("Kode rental tidak sesuai.");
+            }
+        }
+
+        throw new WynixException("Dokumen dengan id " + id + " tidak dapat ditemukan.");
+    }
+
+    @GET
+    @Path("/rents/{id}/return-the-car")
+    @RolesAllowed("UserEntity")
+    public Response returnTheCar (
+            @PathParam("id") Long id,
+            @QueryParam("code") String code
+    ) throws Exception {
+        RentEntity rentEntity = DMLManager.getEntity(RentEntity.class, id);
+
+        if (rentEntity != null) {
+            if (StringUtils.equals(rentEntity.getReturnCode(), code)) {
+                VehicleEntity vehicleEntity = DMLAssembler
+                        .create()
+                        .select("*")
+                        .from("vehicles")
+                        .equalTo("id", rentEntity.getVehicleId())
+                        .getWynixResult(VehicleEntity.class);
+
+                if (vehicleEntity != null) {
+                    rentEntity.markUpdate();
+                    rentEntity.setStatus(Constant.DocumentStatus.CLOSED);
+                    rentEntity.setReturnAt(LocalDate.now());
+
+                    int lateReturnDuration = (int) (ChronoUnit.DAYS.between(rentEntity.getUntil(), rentEntity.getReturnAt()));
+
+                    if (lateReturnDuration > 0) {
+                        rentEntity.setLateReturnDuration(lateReturnDuration);
+                        rentEntity.setLateReturnFinePerDay(vehicleEntity.getLateReturnFinePerDay());
+                        rentEntity.setLateReturnFine(vehicleEntity.getLateReturnFinePerDay().multiply(new BigDecimal(rentEntity.getLateReturnDuration())));
+                    }
+
+                    DMLManager.storeImmediately(rentEntity);
+
+                    return Response
+                            .ok()
+                            .build();
+                }
+            } else {
+                throw new WynixException("Kode rental tidak sesuai.");
+            }
+        }
+
+        throw new WynixException("Dokumen dengan id " + id + " tidak dapat ditemukan.");
     }
 }

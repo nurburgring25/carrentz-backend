@@ -5,17 +5,19 @@ import dev.burikk.carrentz.app.api.service.merchant.rent.item.MerchantRentStoreI
 import dev.burikk.carrentz.app.api.service.merchant.rent.item.MerchantRentUserItem;
 import dev.burikk.carrentz.app.api.service.merchant.rent.item.MerchantRentVehicleItem;
 import dev.burikk.carrentz.app.api.service.merchant.rent.response.MerchantRentListResponse;
+import dev.burikk.carrentz.app.entity.RentEntity;
 import dev.burikk.carrentz.engine.common.Constant;
 import dev.burikk.carrentz.engine.common.SessionManager;
 import dev.burikk.carrentz.engine.common.WynixResults;
 import dev.burikk.carrentz.engine.datasource.DMLAssembler;
+import dev.burikk.carrentz.engine.datasource.DMLManager;
 import dev.burikk.carrentz.engine.datasource.enumeration.JoinType;
 import dev.burikk.carrentz.engine.entity.HashEntity;
+import dev.burikk.carrentz.engine.exception.WynixException;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.security.RolesAllowed;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -47,6 +49,8 @@ public class MerchantRentService {
                 .select("a.duration AS duration")
                 .select("a.cost_per_day AS cost_per_day")
                 .select("a.total AS total")
+                .select("a.rent_code AS rent_code")
+                .select("a.return_code AS return_code")
                 .from("rents a")
                 .join("users b ON b.id = a.user_id", JoinType.INNER_JOIN)
                 .join("vehicles c ON c.id = a.vehicle_id", JoinType.INNER_JOIN)
@@ -100,6 +104,8 @@ public class MerchantRentService {
             merchantRentItem.setDuration(hashEntity.get("duration"));
             merchantRentItem.setCostPerDay(hashEntity.get("cost_per_day"));
             merchantRentItem.setTotal(hashEntity.get("total"));
+            merchantRentItem.setRentCode(hashEntity.get("rent_code"));
+            merchantRentItem.setReturnCode(hashEntity.get("return_code"));
 
             merchantRentListResponse.getDetails().add(merchantRentItem);
         }
@@ -107,5 +113,71 @@ public class MerchantRentService {
         return Response
                 .ok(merchantRentListResponse)
                 .build();
+    }
+
+    @GET
+    @Path("/rents/{id}/get-rent-code")
+    @RolesAllowed("OwnerEntity")
+    public Response getRentCode(
+            @PathParam("id") Long id
+    ) throws Exception {
+        RentEntity rentEntity = DMLManager.getEntity(RentEntity.class, id);
+
+        if (rentEntity != null) {
+            rentEntity.markUpdate();
+            rentEntity.setRentCode(StringUtils.upperCase(StringUtils.right(Long.toHexString(System.currentTimeMillis()), 4)));
+
+            DMLManager.storeImmediately(rentEntity);
+
+            return Response
+                    .ok(rentEntity.getRentCode())
+                    .build();
+        }
+
+        throw new WynixException("Dokumen dengan id " + id + " tidak dapat ditemukan.");
+    }
+
+    @GET
+    @Path("/rents/{id}/get-return-code")
+    @RolesAllowed("OwnerEntity")
+    public Response getReturnCode(
+            @PathParam("id") Long id
+    ) throws Exception {
+        RentEntity rentEntity = DMLManager.getEntity(RentEntity.class, id);
+
+        if (rentEntity != null) {
+            rentEntity.markUpdate();
+            rentEntity.setReturnCode(StringUtils.upperCase(StringUtils.right(Long.toHexString(System.currentTimeMillis()), 4)));
+
+            DMLManager.storeImmediately(rentEntity);
+
+            return Response
+                    .ok(rentEntity.getReturnCode())
+                    .build();
+        }
+
+        throw new WynixException("Dokumen dengan id " + id + " tidak dapat ditemukan.");
+    }
+
+    @DELETE
+    @Path("/rents/{id}")
+    @RolesAllowed("OwnerEntity")
+    public Response cancel(
+            @PathParam("id") Long id
+    ) throws Exception {
+        RentEntity rentEntity = DMLManager.getEntity(RentEntity.class, id);
+
+        if (rentEntity != null) {
+            rentEntity.markUpdate();
+            rentEntity.setStatus(Constant.DocumentStatus.CANCELLED);
+
+            DMLManager.storeImmediately(rentEntity);
+
+            return Response
+                    .ok()
+                    .build();
+        }
+
+        throw new WynixException("Dokumen dengan id " + id + " tidak dapat ditemukan.");
     }
 }

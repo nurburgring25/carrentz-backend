@@ -15,6 +15,8 @@ public class MerchantRentItem {
     private Integer duration;
     private BigDecimal costPerDay;
     private BigDecimal total;
+    private String rentCode;
+    private String returnCode;
 
     public Long getId() {
         return id;
@@ -102,5 +104,21 @@ public class MerchantRentItem {
 
     public void setTotal(BigDecimal total) {
         this.total = total;
+    }
+
+    public String getRentCode() {
+        return rentCode;
+    }
+
+    public void setRentCode(String rentCode) {
+        this.rentCode = rentCode;
+    }
+
+    public String getReturnCode() {
+        return returnCode;
+    }
+
+    public void setReturnCode(String returnCode) {
+        this.returnCode = returnCode;
     }
 }
