@@ -1,16 +1,22 @@
 package dev.burikk.carrentz.app.api.service.user.vehicle;
 
+import dev.burikk.carrentz.app.api.service.user.vehicle.item.UserVehicleImageItem;
 import dev.burikk.carrentz.app.api.service.user.vehicle.item.UserVehicleItem;
 import dev.burikk.carrentz.app.api.service.user.vehicle.response.UserVehicleListResponse;
 import dev.burikk.carrentz.app.entity.VehicleEntity;
 import dev.burikk.carrentz.engine.common.WynixResults;
 import dev.burikk.carrentz.engine.datasource.DMLAssembler;
+import dev.burikk.carrentz.engine.datasource.DMLManager;
 import dev.burikk.carrentz.engine.datasource.enumeration.JoinType;
+import dev.burikk.carrentz.engine.entity.HashEntity;
 
+import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.core.*;
+import java.io.ByteArrayInputStream;
+import java.net.URLConnection;
+import java.util.Arrays;
 
 @Path("/users/")
 public class UserVehicleService {
@@ -47,11 +53,64 @@ public class UserVehicleService {
             userVehicleItem.setCostPerDay(vehicleEntity.getCostPerDay().longValue());
             userVehicleItem.setLateReturnFinePerDay(vehicleEntity.getLateReturnFinePerDay().longValue());
 
+            WynixResults<HashEntity> hashEntities = DMLAssembler
+                    .create()
+                    .select(
+                            "id",
+                            "thumbnail"
+                    )
+                    .from("vehicle_images")
+                    .equalTo("vehicle_id", vehicleEntity.getId())
+                    .getWynixResults(HashEntity.class);
+
+            for (HashEntity hashEntity : hashEntities) {
+                UserVehicleImageItem userVehicleImageItem = new UserVehicleImageItem();
+
+                userVehicleImageItem.setId(hashEntity.get("id"));
+                userVehicleImageItem.setThumbnail(hashEntity.get("thumbnail"));
+                userVehicleImageItem.setUrl("http://192.168.100.76:8080/carrentz/api/users/vehicles/images/" + userVehicleImageItem.getId());
+
+                userVehicleItem.getImages().add(userVehicleImageItem);
+            }
+
             userVehicleListResponse.getDetails().add(userVehicleItem);
         }
 
         return Response
                 .ok(userVehicleListResponse)
+                .build();
+    }
+
+    @GET
+    @PermitAll
+    @Path("/vehicles/images/{id}")
+    public Response image(
+            @Context Request request,
+            @PathParam("id") long id
+    ) throws Exception {
+        byte[] bytes = DMLManager.getObjectFromQuery(
+                "SELECT image FROM vehicle_images WHERE id = ?",
+                id
+        );
+
+        if (bytes != null) {
+            EntityTag entityTag = new EntityTag(Integer.toString(Arrays.hashCode(bytes)));
+
+            Response.ResponseBuilder responseBuilder = request.evaluatePreconditions(entityTag);
+
+            if (responseBuilder == null) {
+                responseBuilder = Response
+                        .ok(bytes)
+                        .header("Content-Type", URLConnection.guessContentTypeFromStream(new ByteArrayInputStream(bytes)));
+
+                responseBuilder.tag(entityTag);
+            }
+
+            return responseBuilder.build();
+        }
+
+        return Response
+                .ok()
                 .build();
     }
 }

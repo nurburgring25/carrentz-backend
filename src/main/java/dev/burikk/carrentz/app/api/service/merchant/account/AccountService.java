@@ -144,7 +144,7 @@ public class AccountService {
             String jwtToken = Jwts.builder()
                     .setSubject(ownerEntity.getId())
                     .setAudience(ownerEntity.getName())
-                    .setExpiration(Date.from(TimeManager.getInstance().now().plusDays(1).atZone(ZoneId.systemDefault()).toInstant()))
+                    .setExpiration(Date.from(TimeManager.getInstance().now().plusYears(5).atZone(ZoneId.systemDefault()).toInstant()))
                     .setIssuedAt(new Date())
                     .setIssuer(Constant.Application.NAME)
                     .setId(String.valueOf(ownerEntity.getId()))

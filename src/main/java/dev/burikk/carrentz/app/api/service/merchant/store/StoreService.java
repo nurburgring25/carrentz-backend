@@ -6,11 +6,18 @@ import dev.burikk.carrentz.app.entity.StoreEntity;
 import dev.burikk.carrentz.engine.common.SessionManager;
 import dev.burikk.carrentz.engine.common.WynixResults;
 import dev.burikk.carrentz.engine.datasource.DMLManager;
+import org.apache.commons.io.IOUtils;
+import org.glassfish.jersey.media.multipart.FormDataBodyPart;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 
+import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.core.*;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.net.URLConnection;
+import java.util.Arrays;
 
 @Path("/merchants/")
 public class StoreService {
@@ -35,6 +42,7 @@ public class StoreService {
             storeItem.setPhoneNumber(storeEntity.getPhoneNumber());
             storeItem.setAddress(storeEntity.getAddress());
             storeItem.setCity(storeEntity.getCity());
+            storeItem.setImageUrl("http://192.168.100.76:8080/carrentz/api/merchants/stores/images/" + storeItem.getId());
 
             storeListResponse.getDetails().add(storeItem);
         }
@@ -47,8 +55,11 @@ public class StoreService {
     @POST
     @Path("/stores")
     @RolesAllowed("OwnerEntity")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response post(StoreItem storeItem) throws Exception {
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public Response post(
+            @FormDataParam("image") FormDataBodyPart formDataBodyPart,
+            @FormDataParam("data") StoreItem storeItem
+    ) throws Exception {
         StoreEntity storeEntity = new StoreEntity();
 
         storeEntity.markNew();
@@ -57,6 +68,14 @@ public class StoreService {
         storeEntity.setPhoneNumber(storeItem.getPhoneNumber());
         storeEntity.setAddress(storeItem.getAddress());
         storeEntity.setCity(storeItem.getCity());
+
+        if (formDataBodyPart != null) {
+            InputStream inputStream = formDataBodyPart.getValueAs(InputStream.class);
+
+            if (inputStream != null) {
+                storeEntity.setImage(IOUtils.toByteArray(inputStream));
+            }
+        }
 
         DMLManager.storeImmediately(storeEntity);
 
@@ -68,10 +87,11 @@ public class StoreService {
     @PUT
     @Path("/stores/{id}")
     @RolesAllowed("OwnerEntity")
-    @Consumes(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response put(
             @PathParam("id") long id,
-            StoreItem storeItem
+            @FormDataParam("image") FormDataBodyPart formDataBodyPart,
+            @FormDataParam("data") StoreItem storeItem
     ) throws Exception {
         StoreEntity storeEntity = DMLManager.getEntity(StoreEntity.class, id);
 
@@ -84,6 +104,14 @@ public class StoreService {
         storeEntity.setPhoneNumber(storeItem.getPhoneNumber());
         storeEntity.setAddress(storeItem.getAddress());
         storeEntity.setCity(storeItem.getCity());
+
+        if (formDataBodyPart != null) {
+            InputStream inputStream = formDataBodyPart.getValueAs(InputStream.class);
+
+            if (inputStream != null) {
+                storeEntity.setImage(IOUtils.toByteArray(inputStream));
+            }
+        }
 
         DMLManager.storeImmediately(storeEntity);
 
@@ -105,6 +133,39 @@ public class StoreService {
         storeEntity.markDelete();
 
         DMLManager.storeImmediately(storeEntity);
+
+        return Response
+                .ok()
+                .build();
+    }
+
+    @GET
+    @PermitAll
+    @Path("/stores/images/{id}")
+    public Response image(
+            @Context Request request,
+            @PathParam("id") long id
+    ) throws Exception {
+        byte[] bytes = DMLManager.getObjectFromQuery(
+                "SELECT image FROM stores WHERE id = ?",
+                id
+        );
+
+        if (bytes != null) {
+            EntityTag entityTag = new EntityTag(Integer.toString(Arrays.hashCode(bytes)));
+
+            Response.ResponseBuilder responseBuilder = request.evaluatePreconditions(entityTag);
+
+            if (responseBuilder == null) {
+                responseBuilder = Response
+                        .ok(bytes)
+                        .header("Content-Type", URLConnection.guessContentTypeFromStream(new ByteArrayInputStream(bytes)));
+
+                responseBuilder.tag(entityTag);
+            }
+
+            return responseBuilder.build();
+        }
 
         return Response
                 .ok()

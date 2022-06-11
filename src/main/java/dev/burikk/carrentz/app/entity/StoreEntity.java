@@ -77,6 +77,12 @@ public class StoreEntity extends Entity {
     )
     private String city;
 
+    @MarkColumn(
+            value = "image",
+            jdbcType = JDBCType.BINARY
+    )
+    private byte[] image;
+
     public Long getId() {
         return this.id;
     }
@@ -131,5 +137,13 @@ public class StoreEntity extends Entity {
 
     public void setCity(String city) {
         this.city = city;
+    }
+
+    public byte[] getImage() {
+        return image;
+    }
+
+    public void setImage(byte[] image) {
+        this.image = image;
     }
 }

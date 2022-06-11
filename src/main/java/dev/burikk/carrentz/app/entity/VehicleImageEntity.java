@@ -38,6 +38,12 @@ public class VehicleImageEntity extends Entity {
     )
     private byte[] image;
 
+    @MarkColumn(
+            value = "thumbnail",
+            jdbcType = JDBCType.BIT
+    )
+    private boolean thumbnail;
+
     public Long getId() {
         return this.id;
     }
@@ -60,5 +66,13 @@ public class VehicleImageEntity extends Entity {
 
     public void setImage(byte[] image) {
         this.image = image;
+    }
+
+    public boolean isThumbnail() {
+        return thumbnail;
+    }
+
+    public void setThumbnail(boolean thumbnail) {
+        this.thumbnail = thumbnail;
     }
 }

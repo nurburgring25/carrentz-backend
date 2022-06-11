@@ -32,12 +32,6 @@ public class MerchantEntity extends Entity {
     )
     private String name;
 
-    @MarkColumn(
-            value = "image",
-            jdbcType = JDBCType.BINARY
-    )
-    private byte[] image;
-
     public Long getId() {
         return this.id;
     }
@@ -52,13 +46,5 @@ public class MerchantEntity extends Entity {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public byte[] getImage() {
-        return this.image;
-    }
-
-    public void setImage(byte[] image) {
-        this.image = image;
     }
 }

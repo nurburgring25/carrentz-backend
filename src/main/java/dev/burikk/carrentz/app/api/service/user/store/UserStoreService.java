@@ -7,10 +7,13 @@ import dev.burikk.carrentz.engine.common.SessionManager;
 import dev.burikk.carrentz.engine.common.WynixResults;
 import dev.burikk.carrentz.engine.datasource.DMLManager;
 
+import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.core.*;
+import java.io.ByteArrayInputStream;
+import java.net.URLConnection;
+import java.util.Arrays;
 
 @Path("/users/")
 public class UserStoreService {
@@ -36,12 +39,46 @@ public class UserStoreService {
             storeItem.setPhoneNumber(storeEntity.getPhoneNumber());
             storeItem.setAddress(storeEntity.getAddress());
             storeItem.setCity(storeEntity.getCity());
+            storeItem.setImageUrl("http://192.168.100.76:8080/carrentz/api/users/stores/images/" + storeItem.getId());
 
             userStoreListResponse.getDetails().add(storeItem);
         }
 
         return Response
                 .ok(userStoreListResponse)
+                .build();
+    }
+
+    @GET
+    @PermitAll
+    @Path("/stores/images/{id}")
+    public Response image(
+            @Context Request request,
+            @PathParam("id") long id
+    ) throws Exception {
+        byte[] bytes = DMLManager.getObjectFromQuery(
+                "SELECT image FROM stores WHERE id = ?",
+                id
+        );
+
+        if (bytes != null) {
+            EntityTag entityTag = new EntityTag(Integer.toString(Arrays.hashCode(bytes)));
+
+            Response.ResponseBuilder responseBuilder = request.evaluatePreconditions(entityTag);
+
+            if (responseBuilder == null) {
+                responseBuilder = Response
+                        .ok(bytes)
+                        .header("Content-Type", URLConnection.guessContentTypeFromStream(new ByteArrayInputStream(bytes)));
+
+                responseBuilder.tag(entityTag);
+            }
+
+            return responseBuilder.build();
+        }
+
+        return Response
+                .ok()
                 .build();
     }
 }

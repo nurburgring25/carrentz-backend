@@ -1,5 +1,8 @@
 package dev.burikk.carrentz.app.api.service.user.vehicle.item;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class UserVehicleItem {
     private Long id;
     private Long storeId;
@@ -11,6 +14,11 @@ public class UserVehicleItem {
     private String description;
     private long costPerDay;
     private long lateReturnFinePerDay;
+    private List<UserVehicleImageItem> images;
+
+    {
+        this.images = new ArrayList<>();
+    }
 
     public Long getId() {
         return id;
@@ -90,5 +98,13 @@ public class UserVehicleItem {
 
     public void setLateReturnFinePerDay(long lateReturnFinePerDay) {
         this.lateReturnFinePerDay = lateReturnFinePerDay;
+    }
+
+    public List<UserVehicleImageItem> getImages() {
+        return images;
+    }
+
+    public void setImages(List<UserVehicleImageItem> images) {
+        this.images = images;
     }
 }

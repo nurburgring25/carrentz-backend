@@ -1,5 +1,7 @@
 package dev.burikk.carrentz.app.entity;
 
+import dev.burikk.carrentz.engine.common.WynixResults;
+import dev.burikk.carrentz.engine.datasource.DMLAssembler;
 import dev.burikk.carrentz.engine.datasource.annotation.*;
 import dev.burikk.carrentz.engine.datasource.enumeration.JoinType;
 import dev.burikk.carrentz.engine.entity.Entity;
@@ -100,6 +102,12 @@ public class VehicleEntity extends Entity {
     )
     private BigDecimal lateReturnFinePerDay;
 
+    private WynixResults<VehicleImageEntity> vehicleImageEntities;
+
+    {
+        this.vehicleImageEntities = new WynixResults<>();
+    }
+
     public Long getId() {
         return id;
     }
@@ -178,5 +186,18 @@ public class VehicleEntity extends Entity {
 
     public void setLateReturnFinePerDay(BigDecimal lateReturnFinePerDay) {
         this.lateReturnFinePerDay = lateReturnFinePerDay;
+    }
+
+    public WynixResults<VehicleImageEntity> getVehicleImageEntities() throws Exception {
+        if (this.id != null && this.vehicleImageEntities.isEmpty()) {
+            this.vehicleImageEntities = DMLAssembler
+                    .create()
+                    .select("*")
+                    .from("vehicle_images")
+                    .equalTo("vehicle_id", this.id)
+                    .getWynixResults(VehicleImageEntity.class);
+        }
+
+        return vehicleImageEntities;
     }
 }
