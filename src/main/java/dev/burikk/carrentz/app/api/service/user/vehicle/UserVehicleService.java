@@ -4,11 +4,13 @@ import dev.burikk.carrentz.app.api.service.user.vehicle.item.UserVehicleImageIte
 import dev.burikk.carrentz.app.api.service.user.vehicle.item.UserVehicleItem;
 import dev.burikk.carrentz.app.api.service.user.vehicle.response.UserVehicleListResponse;
 import dev.burikk.carrentz.app.entity.VehicleEntity;
+import dev.burikk.carrentz.engine.common.Constant;
 import dev.burikk.carrentz.engine.common.WynixResults;
 import dev.burikk.carrentz.engine.datasource.DMLAssembler;
 import dev.burikk.carrentz.engine.datasource.DMLManager;
 import dev.burikk.carrentz.engine.datasource.enumeration.JoinType;
 import dev.burikk.carrentz.engine.entity.HashEntity;
+import org.apache.commons.lang3.SerializationUtils;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -16,6 +18,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.io.ByteArrayInputStream;
 import java.net.URLConnection;
+import java.time.LocalDate;
 import java.util.Arrays;
 
 @Path("/users/")
@@ -74,6 +77,41 @@ public class UserVehicleService {
             }
 
             userVehicleListResponse.getDetails().add(userVehicleItem);
+
+            WynixResults<HashEntity> bookedDates = DMLAssembler
+                    .create()
+                    .select(
+                            "start",
+                            "until"
+                    )
+                    .from("rents a")
+                    .join("vehicles b ON b.id = a.vehicle_id", JoinType.INNER_JOIN)
+                    .equalTo("a.vehicle_id", vehicleEntity.getId())
+                    .and()
+                    .notEqualTo("a.status", Constant.DocumentStatus.CANCELLED)
+                    .and()
+                    .greaterThanOrEqualTo("start", LocalDate.now())
+                    .asc("start")
+                    .asc("until")
+                    .getWynixResults(HashEntity.class);
+
+            LocalDate localDate = LocalDate.now();
+
+            for (HashEntity bookedDate : bookedDates) {
+                while (true) {
+                    if (localDate.compareTo(bookedDate.get("start")) >= 0 && localDate.compareTo(bookedDate.get("until")) <= 0) {
+                        userVehicleItem.getBookedDates().add(SerializationUtils.clone(localDate));
+                    }
+
+                    if (localDate.compareTo(bookedDate.get("until")) == 0) {
+                        localDate = localDate.plusDays(1);
+
+                        break;
+                    }
+
+                    localDate = localDate.plusDays(1);
+                }
+            }
         }
 
         return Response

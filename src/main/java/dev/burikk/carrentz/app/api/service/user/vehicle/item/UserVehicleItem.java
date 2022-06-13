@@ -1,5 +1,6 @@
 package dev.burikk.carrentz.app.api.service.user.vehicle.item;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,9 +16,11 @@ public class UserVehicleItem {
     private long costPerDay;
     private long lateReturnFinePerDay;
     private List<UserVehicleImageItem> images;
+    private List<LocalDate> bookedDates;
 
     {
         this.images = new ArrayList<>();
+        this.bookedDates = new ArrayList<>();
     }
 
     public Long getId() {
@@ -106,5 +109,13 @@ public class UserVehicleItem {
 
     public void setImages(List<UserVehicleImageItem> images) {
         this.images = images;
+    }
+
+    public List<LocalDate> getBookedDates() {
+        return bookedDates;
+    }
+
+    public void setBookedDates(List<LocalDate> bookedDates) {
+        this.bookedDates = bookedDates;
     }
 }
