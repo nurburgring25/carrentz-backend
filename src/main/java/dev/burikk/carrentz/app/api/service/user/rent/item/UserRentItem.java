@@ -15,6 +15,7 @@ public class UserRentItem {
     private Integer duration;
     private BigDecimal costPerDay;
     private BigDecimal total;
+    private BigDecimal downPayment;
 
     public Long getId() {
         return id;
@@ -102,5 +103,13 @@ public class UserRentItem {
 
     public void setTotal(BigDecimal total) {
         this.total = total;
+    }
+
+    public BigDecimal getDownPayment() {
+        return downPayment;
+    }
+
+    public void setDownPayment(BigDecimal downPayment) {
+        this.downPayment = downPayment;
     }
 }

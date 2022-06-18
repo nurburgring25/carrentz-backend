@@ -52,12 +52,19 @@ public class Constant {
         public static final String CANCELLED = "CANCELLED";
     }
 
+    public static class PaymentType {
+        public static final String DOWN_PAYMENT = "DOWN_PAYMENT";
+        public static final String RENT = "RENT";
+        public static final String LATE_RETURN_FINE = "LATE_RETURN_FINE";
+    }
+
     public static List<Class<? extends Entity>> ENTITY_CLASSES = Arrays.asList(
             ConfigurationEntity.class,
             LogEntity.class,
             MerchantEntity.class,
             OwnerEntity.class,
             OwnerSessionEntity.class,
+            PaymentEntity.class,
             RentEntity.class,
             StoreEntity.class,
             UserEntity.class,

@@ -6,6 +6,7 @@ import dev.burikk.carrentz.app.api.service.user.rent.item.UserRentUserItem;
 import dev.burikk.carrentz.app.api.service.user.rent.item.UserRentVehicleItem;
 import dev.burikk.carrentz.app.api.service.user.rent.request.RentRequest;
 import dev.burikk.carrentz.app.api.service.user.rent.response.UserRentListResponse;
+import dev.burikk.carrentz.app.entity.PaymentEntity;
 import dev.burikk.carrentz.app.entity.RentEntity;
 import dev.burikk.carrentz.app.entity.VehicleEntity;
 import dev.burikk.carrentz.engine.common.Constant;
@@ -23,8 +24,8 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.time.Period;
 import java.time.temporal.ChronoUnit;
 
 /**
@@ -59,12 +60,16 @@ public class RentService {
                 .select("a.duration AS duration")
                 .select("a.cost_per_day AS cost_per_day")
                 .select("a.total AS total")
+                .select("f.amount AS down_payment")
                 .from("rents a")
                 .join("users b ON b.id = a.user_id", JoinType.INNER_JOIN)
                 .join("vehicles c ON c.id = a.vehicle_id", JoinType.INNER_JOIN)
                 .join("stores d ON d.id = c.store_id", JoinType.INNER_JOIN)
                 .join("vehicle_types e ON e.id = c.vehicle_type_id", JoinType.INNER_JOIN)
+                .join("payments f ON f.rent_id = a.id", JoinType.INNER_JOIN)
                 .equalTo("b.id", SessionManager.getInstance().getWynixUser().getIdentity())
+                .and()
+                .equalTo("f.type", Constant.PaymentType.DOWN_PAYMENT)
                 .desc("a.start")
                 .getWynixResults(HashEntity.class);
 
@@ -110,6 +115,7 @@ public class RentService {
             userRentItem.setDuration(hashEntity.get("duration"));
             userRentItem.setCostPerDay(hashEntity.get("cost_per_day"));
             userRentItem.setTotal(hashEntity.get("total"));
+            userRentItem.setDownPayment(hashEntity.get("down_payment"));
 
             userRentListResponse.getDetails().add(userRentItem);
         }
@@ -132,27 +138,63 @@ public class RentService {
                 .getWynixResult(VehicleEntity.class);
 
         if (vehicleEntity != null) {
-            RentEntity rentEntity = new RentEntity();
+            try (DMLManager dmlManager = new DMLManager()) {
+                dmlManager.begin();
 
-            rentEntity.markNew();
-            rentEntity.setUserId(SessionManager.getInstance().getWynixUser().getIdentity());
-            rentEntity.setVehicleId(rentRequest.getVehicleId());
-            rentEntity.setNumber("TRX-" + StringUtils.upperCase(Long.toHexString(System.currentTimeMillis())));
-            rentEntity.setStatus(Constant.DocumentStatus.OPENED);
-            rentEntity.setStart(rentRequest.getStart());
-            rentEntity.setUntil(rentRequest.getUntil());
-            rentEntity.setDuration((int) (ChronoUnit.DAYS.between(rentEntity.getStart(), rentEntity.getUntil()) + 1));
-            rentEntity.setCostPerDay(vehicleEntity.getCostPerDay());
-            rentEntity.setTotal(vehicleEntity.getCostPerDay().multiply(new BigDecimal(rentEntity.getDuration())));
+                RentEntity rentEntity = new RentEntity();
+
+                rentEntity.markNew();
+                rentEntity.setUserId(SessionManager.getInstance().getWynixUser().getIdentity());
+                rentEntity.setVehicleId(rentRequest.getVehicleId());
+                rentEntity.setNumber("TRX-" + StringUtils.upperCase(Long.toHexString(System.currentTimeMillis())));
+                rentEntity.setStatus(Constant.DocumentStatus.OPENED);
+                rentEntity.setStart(rentRequest.getStart());
+                rentEntity.setUntil(rentRequest.getUntil());
+                rentEntity.setDuration((int) (ChronoUnit.DAYS.between(rentEntity.getStart(), rentEntity.getUntil()) + 1));
+                rentEntity.setCostPerDay(vehicleEntity.getCostPerDay());
+                rentEntity.setTotal(vehicleEntity.getCostPerDay().multiply(new BigDecimal(rentEntity.getDuration())));
+
+                Long rentId = dmlManager.store(rentEntity);
+
+                PaymentEntity paymentEntity = new PaymentEntity();
+
+                paymentEntity.markNew();
+                paymentEntity.setRentId(rentId);
+                paymentEntity.setType(Constant.PaymentType.DOWN_PAYMENT);
+                paymentEntity.setAmount(rentEntity.getTotal().multiply(new BigDecimal(20)).divide(new BigDecimal(100), 0, RoundingMode.CEILING));
+
+                dmlManager.store(paymentEntity);
+                dmlManager.commit();
+
+                return Response
+                        .ok()
+                        .build();
+            }
+        } else {
+            throw new WynixException("Mobil dengan id " + rentRequest.getVehicleId() + " tidak dapat ditemukan.");
+        }
+    }
+
+    @DELETE
+    @Path("/rents/{id}")
+    @RolesAllowed("UserEntity")
+    public Response cancel(
+            @PathParam("id") Long id
+    ) throws Exception {
+        RentEntity rentEntity = DMLManager.getEntity(RentEntity.class, id);
+
+        if (rentEntity != null) {
+            rentEntity.markUpdate();
+            rentEntity.setStatus(Constant.DocumentStatus.CANCELLED);
 
             DMLManager.storeImmediately(rentEntity);
 
             return Response
                     .ok()
                     .build();
-        } else {
-            throw new WynixException("Mobil dengan id " + rentRequest.getVehicleId() + " tidak dapat ditemukan.");
         }
+
+        throw new WynixException("Dokumen dengan id " + id + " tidak dapat ditemukan.");
     }
 
     @GET
@@ -166,14 +208,36 @@ public class RentService {
 
         if (rentEntity != null) {
             if (StringUtils.equals(rentEntity.getRentCode(), code)) {
-                rentEntity.markUpdate();
-                rentEntity.setStatus(Constant.DocumentStatus.ONGOING);
+                PaymentEntity downPayment = DMLManager.getWynixResultFromQuery(
+                        "SELECT * FROM payments WHERE rent_id = ? AND type = ?",
+                        PaymentEntity.class,
+                        rentEntity.getId(),
+                        Constant.PaymentType.DOWN_PAYMENT
+                );
 
-                DMLManager.storeImmediately(rentEntity);
+                if (downPayment != null) {
+                    try (DMLManager dmlManager = new DMLManager()) {
+                        dmlManager.begin();
 
-                return Response
-                        .ok()
-                        .build();
+                        rentEntity.markUpdate();
+                        rentEntity.setStatus(Constant.DocumentStatus.ONGOING);
+
+                        PaymentEntity paymentEntity = new PaymentEntity();
+
+                        paymentEntity.markNew();
+                        paymentEntity.setRentId(rentEntity.getId());
+                        paymentEntity.setType(Constant.PaymentType.RENT);
+                        paymentEntity.setAmount(rentEntity.getTotal().subtract(downPayment.getAmount()));
+
+                        dmlManager.store(rentEntity);
+                        dmlManager.store(paymentEntity);
+                        dmlManager.commit();
+
+                        return Response
+                                .ok()
+                                .build();
+                    }
+                }
             } else {
                 throw new WynixException("Kode rental tidak sesuai.");
             }

@@ -159,27 +159,7 @@ public class MerchantRentService {
         throw new WynixException("Dokumen dengan id " + id + " tidak dapat ditemukan.");
     }
 
-    @DELETE
-    @Path("/rents/{id}")
-    @RolesAllowed("OwnerEntity")
-    public Response cancel(
-            @PathParam("id") Long id
-    ) throws Exception {
-        RentEntity rentEntity = DMLManager.getEntity(RentEntity.class, id);
 
-        if (rentEntity != null) {
-            rentEntity.markUpdate();
-            rentEntity.setStatus(Constant.DocumentStatus.CANCELLED);
-
-            DMLManager.storeImmediately(rentEntity);
-
-            return Response
-                    .ok()
-                    .build();
-        }
-
-        throw new WynixException("Dokumen dengan id " + id + " tidak dapat ditemukan.");
-    }
 
     @GET
     @Path("/rents/{id}")
