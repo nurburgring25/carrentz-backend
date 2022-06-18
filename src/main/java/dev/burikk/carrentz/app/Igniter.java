@@ -5,6 +5,7 @@ import dev.burikk.carrentz.app.api.filter.LogFilter;
 import dev.burikk.carrentz.app.api.service.merchant.account.AccountService;
 import dev.burikk.carrentz.app.api.service.merchant.dashboard.DashboardService;
 import dev.burikk.carrentz.app.api.service.merchant.rent.MerchantRentService;
+import dev.burikk.carrentz.app.api.service.merchant.report.ReportService;
 import dev.burikk.carrentz.app.api.service.merchant.store.StoreService;
 import dev.burikk.carrentz.app.api.service.merchant.vehicle.VehicleService;
 import dev.burikk.carrentz.app.api.service.merchant.vehicleavailibility.VehicleAvailibilityService;
@@ -76,6 +77,7 @@ public class Igniter extends Application {
         classes.add(MerchantRentService.class);
         classes.add(VehicleAvailibilityService.class);
         classes.add(DashboardService.class);
+        classes.add(ReportService.class);
 
         classes.add(dev.burikk.carrentz.app.api.service.user.account.AccountService.class);
         classes.add(HomeService.class);
