@@ -1,17 +1,12 @@
 package dev.burikk.carrentz.app.api.service.merchant.report;
 
-import dev.burikk.carrentz.app.api.service.merchant.report.item.RentByCustomerItem;
-import dev.burikk.carrentz.app.api.service.merchant.report.item.RentByStoreItem;
-import dev.burikk.carrentz.app.api.service.merchant.report.item.RentByVehicleItem;
-import dev.burikk.carrentz.app.api.service.merchant.report.item.RentByVehicleTypeItem;
-import dev.burikk.carrentz.app.api.service.merchant.report.response.RentByCustomerResponse;
-import dev.burikk.carrentz.app.api.service.merchant.report.response.RentByStoreResponse;
-import dev.burikk.carrentz.app.api.service.merchant.report.response.RentByVehicleResponse;
-import dev.burikk.carrentz.app.api.service.merchant.report.response.RentByVehicleTypeResponse;
+import dev.burikk.carrentz.app.api.service.merchant.report.item.*;
+import dev.burikk.carrentz.app.api.service.merchant.report.response.*;
 import dev.burikk.carrentz.engine.common.Constant;
 import dev.burikk.carrentz.engine.common.SessionManager;
 import dev.burikk.carrentz.engine.common.WynixResults;
 import dev.burikk.carrentz.engine.datasource.DMLAssembler;
+import dev.burikk.carrentz.engine.datasource.DMLManager;
 import dev.burikk.carrentz.engine.datasource.enumeration.JoinType;
 import dev.burikk.carrentz.engine.entity.HashEntity;
 
@@ -27,6 +22,57 @@ import java.time.ZoneId;
 
 @Path("/merchants/")
 public class ReportService {
+    @GET
+    @Path("/reports/daily-rents")
+    @RolesAllowed("OwnerEntity")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response dailyRents(
+            @QueryParam("start") long start,
+            @QueryParam("until") long until
+    ) throws Exception {
+        DailyRentResponse dailyRentResponse = new DailyRentResponse();
+
+        WynixResults<HashEntity> hashEntities = DMLManager.getWynixResultsFromQuery(
+                "SELECT date::DATE AS date,\n" +
+                        "COALESCE(SUM(CASE WHEN b.type = ? THEN b.amount ELSE 0 END), 0) AS down_payment,\n" +
+                        "COALESCE(SUM(CASE WHEN b.type = ? THEN b.amount ELSE 0 END), 0) AS amount,\n" +
+                        "COALESCE(SUM(CASE WHEN b.type = ? THEN b.amount ELSE 0 END), 0) AS late_return_fine\n" +
+                        "FROM GENERATE_SERIES(CURRENT_DATE - INTERVAL '6' DAY, CURRENT_DATE, '1 DAY') AS date\n" +
+                        "LEFT JOIN (\n" +
+                        "SELECT d.created::DATE AS tanggal,\n" +
+                        "d.amount AS amount,\n" +
+                        "d.type AS type\n" +
+                        "FROM rents a\n" +
+                        "INNER JOIN vehicles b ON b.id = a.vehicle_id\n" +
+                        "INNER JOIN stores c ON c.id = b.store_id\n" +
+                        "INNER JOIN payments d ON d.rent_id = a.id\n" +
+                        "WHERE c.merchant_id = ?\n" +
+                        ") b ON b.tanggal = date::DATE\n" +
+                        "GROUP BY date::DATE\n" +
+                        "ORDER BY date::DATE;",
+                HashEntity.class,
+                Constant.PaymentType.DOWN_PAYMENT,
+                Constant.PaymentType.RENT,
+                Constant.PaymentType.LATE_RETURN_FINE,
+                SessionManager.getInstance().getMerchantId()
+        );
+
+        for (HashEntity hashEntity : hashEntities) {
+            DailyRentItem dailyRentItem = new DailyRentItem();
+
+            dailyRentItem.setDate(hashEntity.get("date"));
+            dailyRentItem.setDownPayment(hashEntity.get("down_payment"));
+            dailyRentItem.setAmount(hashEntity.get("amount"));
+            dailyRentItem.setLateReturnFine(hashEntity.get("late_return_fine"));
+
+            dailyRentResponse.getDailyRentItems().add(dailyRentItem);
+        }
+
+        return Response
+                .ok(dailyRentResponse)
+                .build();
+    }
+
     @GET
     @Path("/reports/rent-by-vehicles")
     @RolesAllowed("OwnerEntity")
