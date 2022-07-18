@@ -108,8 +108,10 @@ public class DashboardService {
                     .limit(1)
                     .getWynixResult(HashEntity.class);
 
-            dashboardResponse.setMostFavoriteVehicle(hashEntity.get("name"));
-            dashboardResponse.setMostFavoriteVehicleValue(hashEntity.<Long>get("duration").intValue());
+            if (hashEntity != null) {
+                dashboardResponse.setMostFavoriteVehicle(hashEntity.get("name"));
+                dashboardResponse.setMostFavoriteVehicleValue(hashEntity.<Long>get("duration").intValue());
+            }
         }
 
         {
@@ -138,8 +140,10 @@ public class DashboardService {
                     .limit(1)
                     .getWynixResult(HashEntity.class);
 
-            dashboardResponse.setMostFavoriteVehicleType(hashEntity.get("name"));
-            dashboardResponse.setMostFavoriteVehicleTypeValue(hashEntity.get("duration"));
+            if (hashEntity != null) {
+                dashboardResponse.setMostFavoriteVehicleType(hashEntity.get("name"));
+                dashboardResponse.setMostFavoriteVehicleTypeValue(hashEntity.get("duration"));
+            }
         }
 
         {
@@ -166,8 +170,10 @@ public class DashboardService {
                     .limit(1)
                     .getWynixResult(HashEntity.class);
 
-            dashboardResponse.setMostFavoriteStore(hashEntity.get("name"));
-            dashboardResponse.setMostFavoriteStoreValue(hashEntity.get("amount"));
+            if (hashEntity != null) {
+                dashboardResponse.setMostFavoriteStore(hashEntity.get("name"));
+                dashboardResponse.setMostFavoriteStoreValue(hashEntity.get("amount"));
+            }
         }
 
         {
@@ -195,8 +201,10 @@ public class DashboardService {
                     .limit(1)
                     .getWynixResult(HashEntity.class);
 
-            dashboardResponse.setMostFavoriteCustomer(hashEntity.get("name"));
-            dashboardResponse.setMostFavoriteCustomerValue(hashEntity.get("amount"));
+            if (hashEntity != null) {
+                dashboardResponse.setMostFavoriteCustomer(hashEntity.get("name"));
+                dashboardResponse.setMostFavoriteCustomerValue(hashEntity.get("amount"));
+            }
         }
 
         return Response
