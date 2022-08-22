@@ -171,7 +171,7 @@ public class RentService {
                         .build();
             }
         } else {
-            throw new WynixException("Mobil dengan id " + rentRequest.getVehicleId() + " tidak dapat ditemukan.");
+            throw new WynixException("Kendaraan dengan id " + rentRequest.getVehicleId() + " tidak dapat ditemukan.");
         }
     }
 
@@ -198,9 +198,9 @@ public class RentService {
     }
 
     @GET
-    @Path("/rents/{id}/take-the-car")
+    @Path("/rents/{id}/take-vehicle")
     @RolesAllowed("UserEntity")
-    public Response takeTheCar (
+    public Response takeVehicle (
             @PathParam("id") Long id,
             @QueryParam("code") String code
     ) throws Exception {
@@ -247,9 +247,9 @@ public class RentService {
     }
 
     @GET
-    @Path("/rents/{id}/return-the-car")
+    @Path("/rents/{id}/return-vehicle")
     @RolesAllowed("UserEntity")
-    public Response returnTheCar (
+    public Response returnVehicle (
             @PathParam("id") Long id,
             @QueryParam("code") String code
     ) throws Exception {
