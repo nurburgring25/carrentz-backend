@@ -1,14 +1,19 @@
 package dev.burikk.carrentz.app.api.service.user.account;
 
+import dev.burikk.carrentz.app.api.service.user.account.request.ChangePasswordRequest;
 import dev.burikk.carrentz.app.api.service.user.account.request.RegisterRequest;
 import dev.burikk.carrentz.app.api.service.user.account.request.SignInRequest;
 import dev.burikk.carrentz.app.api.service.user.account.request.VerificationRequest;
 import dev.burikk.carrentz.app.api.service.user.account.response.SignInResponse;
+import dev.burikk.carrentz.app.api.service.user.home.item.HomeVehicleTypeItem;
+import dev.burikk.carrentz.app.api.service.user.home.response.HomeVehicleTypeResponse;
 import dev.burikk.carrentz.app.entity.*;
 import dev.burikk.carrentz.engine.common.Constant;
 import dev.burikk.carrentz.engine.common.SessionManager;
 import dev.burikk.carrentz.engine.common.TimeManager;
+import dev.burikk.carrentz.engine.common.WynixResults;
 import dev.burikk.carrentz.engine.datasource.DMLManager;
+import dev.burikk.carrentz.engine.entity.HashEntity;
 import dev.burikk.carrentz.engine.security.Crypt;
 import dev.burikk.carrentz.engine.security.Digest;
 import dev.burikk.carrentz.engine.util.Validators;
@@ -17,10 +22,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.security.PermitAll;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.time.LocalDateTime;
@@ -154,5 +156,23 @@ public class AccountService {
                     .header("Access-Control-Expose-Headers", "Authorization")
                     .build();
         }
+    }
+
+    @PUT
+    @Path("/change-password")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response changePassword(ChangePasswordRequest changePasswordRequest) throws Exception {
+        UserEntity userEntity = (UserEntity) SessionManager.getInstance().getWynixUser();
+
+        Validators.validate(!StringUtils.equals(userEntity.getPassword(), Digest.MD5(userEntity.getId(), changePasswordRequest.getOldPassword())), "Kata sandi lama tidak sesuai.");
+
+        userEntity.markUpdate();
+        userEntity.setPassword(Digest.MD5(userEntity.getId(), changePasswordRequest.getNewPassword()));
+
+        DMLManager.storeImmediately(userEntity);
+
+        return Response
+                .ok()
+                .build();
     }
 }

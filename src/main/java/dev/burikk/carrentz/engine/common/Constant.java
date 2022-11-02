@@ -17,6 +17,7 @@ public class Constant {
         public static final String KEY = "Burikk_Carrentz;";
         public static final Boolean USING_SERVER_TIME = true;
         public static final Boolean EMBED = false;
+        public static final String BASE_URL = "http://10.0.2.2:8080/carrentz/api/";
     }
 
     public static class Crypto {

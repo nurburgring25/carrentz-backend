@@ -69,8 +69,9 @@ public class DashboardService {
             if (yesterday.compareTo(BigDecimal.ZERO) != 0) {
                 dashboardResponse.setIncomingPaymentDifferencePercentage(
                         dashboardResponse.getIncomingPaymentDifferenceAmount()
-                                .divide(yesterday, 0, RoundingMode.CEILING)
+                                .divide(yesterday, 2, RoundingMode.CEILING)
                                 .multiply(new BigDecimal(100))
+                                .setScale(0, RoundingMode.CEILING)
                 );
             } else {
                 dashboardResponse.setIncomingPaymentDifferencePercentage(new BigDecimal(100));

@@ -1,5 +1,6 @@
 package dev.burikk.carrentz.app.api.service.merchant.account;
 
+import dev.burikk.carrentz.app.api.service.merchant.account.request.ChangePasswordRequest;
 import dev.burikk.carrentz.app.api.service.merchant.account.request.RegisterRequest;
 import dev.burikk.carrentz.app.api.service.merchant.account.request.SignInRequest;
 import dev.burikk.carrentz.app.api.service.merchant.account.request.VerificationRequest;
@@ -23,10 +24,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.security.PermitAll;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.time.LocalDateTime;
@@ -186,5 +184,23 @@ public class AccountService {
                     .header("Access-Control-Expose-Headers", "Authorization")
                     .build();
         }
+    }
+
+    @PUT
+    @Path("/change-password")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response changePassword(ChangePasswordRequest changePasswordRequest) throws Exception {
+        OwnerEntity ownerEntity = (OwnerEntity) SessionManager.getInstance().getWynixUser();
+
+        Validators.validate(!StringUtils.equals(ownerEntity.getPassword(), Digest.MD5(ownerEntity.getId(), changePasswordRequest.getOldPassword())), "Kata sandi lama tidak sesuai.");
+
+        ownerEntity.markUpdate();
+        ownerEntity.setPassword(Digest.MD5(ownerEntity.getId(), changePasswordRequest.getNewPassword()));
+
+        DMLManager.storeImmediately(ownerEntity);
+
+        return Response
+                .ok()
+                .build();
     }
 }

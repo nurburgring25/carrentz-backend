@@ -6,7 +6,6 @@ import dev.burikk.carrentz.app.api.service.merchant.rent.item.MerchantRentUserIt
 import dev.burikk.carrentz.app.api.service.merchant.rent.item.MerchantRentVehicleItem;
 import dev.burikk.carrentz.app.api.service.merchant.rent.response.MerchantRentListResponse;
 import dev.burikk.carrentz.app.entity.RentEntity;
-import dev.burikk.carrentz.engine.common.Constant;
 import dev.burikk.carrentz.engine.common.SessionManager;
 import dev.burikk.carrentz.engine.common.WynixResults;
 import dev.burikk.carrentz.engine.datasource.DMLAssembler;
@@ -57,8 +56,6 @@ public class MerchantRentService {
                 .join("stores d ON d.id = c.store_id", JoinType.INNER_JOIN)
                 .join("vehicle_types e ON e.id = c.vehicle_type_id", JoinType.INNER_JOIN)
                 .equalTo("d.merchant_id", SessionManager.getInstance().getMerchantId())
-                .and()
-                .in("a.status", Constant.DocumentStatus.OPENED, Constant.DocumentStatus.ONGOING)
                 .desc("a.start")
                 .getWynixResults(HashEntity.class);
 

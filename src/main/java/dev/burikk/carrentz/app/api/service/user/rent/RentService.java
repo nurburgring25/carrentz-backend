@@ -6,6 +6,7 @@ import dev.burikk.carrentz.app.api.service.user.rent.item.UserRentUserItem;
 import dev.burikk.carrentz.app.api.service.user.rent.item.UserRentVehicleItem;
 import dev.burikk.carrentz.app.api.service.user.rent.request.RentRequest;
 import dev.burikk.carrentz.app.api.service.user.rent.response.UserRentListResponse;
+import dev.burikk.carrentz.app.common.TransactionNumbers;
 import dev.burikk.carrentz.app.entity.PaymentEntity;
 import dev.burikk.carrentz.app.entity.RentEntity;
 import dev.burikk.carrentz.app.entity.VehicleEntity;
@@ -146,7 +147,7 @@ public class RentService {
                 rentEntity.markNew();
                 rentEntity.setUserId(SessionManager.getInstance().getWynixUser().getIdentity());
                 rentEntity.setVehicleId(rentRequest.getVehicleId());
-                rentEntity.setNumber("TRX-" + StringUtils.upperCase(Long.toHexString(System.currentTimeMillis())));
+                rentEntity.setNumber(TransactionNumbers.rent(LocalDate.now()));
                 rentEntity.setStatus(Constant.DocumentStatus.OPENED);
                 rentEntity.setStart(rentRequest.getStart());
                 rentEntity.setUntil(rentRequest.getUntil());
@@ -284,7 +285,7 @@ public class RentService {
                             .build();
                 }
             } else {
-                throw new WynixException("Kode rental tidak sesuai.");
+                throw new WynixException("Kode pengembalian tidak sesuai.");
             }
         }
 

@@ -7,6 +7,7 @@ import dev.burikk.carrentz.app.api.service.merchant.vehicle.response.VehicleList
 import dev.burikk.carrentz.app.api.service.merchant.vehicle.response.VehicleResourceResponse;
 import dev.burikk.carrentz.app.entity.VehicleEntity;
 import dev.burikk.carrentz.app.entity.VehicleImageEntity;
+import dev.burikk.carrentz.engine.common.Constant;
 import dev.burikk.carrentz.engine.common.SessionManager;
 import dev.burikk.carrentz.engine.common.WynixResults;
 import dev.burikk.carrentz.engine.datasource.DMLAssembler;
@@ -78,7 +79,7 @@ public class VehicleService {
 
                 vehicleImageItem.setId(hashEntity.get("id"));
                 vehicleImageItem.setThumbnail(hashEntity.get("thumbnail"));
-                vehicleImageItem.setUrl("http://192.168.100.76:8080/carrentz/api/merchants/vehicles/images/" + vehicleImageItem.getId());
+                vehicleImageItem.setUrl(Constant.Application.BASE_URL + "merchants/vehicles/images/" + vehicleImageItem.getId());
 
                 vehicleItem.getImages().add(vehicleImageItem);
             }

@@ -3,6 +3,7 @@ package dev.burikk.carrentz.app.api.service.merchant.store;
 import dev.burikk.carrentz.app.api.service.merchant.store.item.StoreItem;
 import dev.burikk.carrentz.app.api.service.merchant.store.response.StoreListResponse;
 import dev.burikk.carrentz.app.entity.StoreEntity;
+import dev.burikk.carrentz.engine.common.Constant;
 import dev.burikk.carrentz.engine.common.SessionManager;
 import dev.burikk.carrentz.engine.common.WynixResults;
 import dev.burikk.carrentz.engine.datasource.DMLManager;
@@ -42,7 +43,7 @@ public class StoreService {
             storeItem.setPhoneNumber(storeEntity.getPhoneNumber());
             storeItem.setAddress(storeEntity.getAddress());
             storeItem.setCity(storeEntity.getCity());
-            storeItem.setImageUrl("http://192.168.100.76:8080/carrentz/api/merchants/stores/images/" + storeItem.getId());
+            storeItem.setImageUrl(Constant.Application.BASE_URL + "merchants/stores/images/" + storeItem.getId());
 
             storeListResponse.getDetails().add(storeItem);
         }

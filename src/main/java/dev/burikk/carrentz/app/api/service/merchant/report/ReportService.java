@@ -120,7 +120,7 @@ public class ReportService {
             rentByVehicleItem.setName(hashEntity.get("name"));
             rentByVehicleItem.setVehicleTypeName(hashEntity.get("vehicle_type_name"));
             rentByVehicleItem.setLicenseNumber(hashEntity.get("license_number"));
-            rentByVehicleItem.setImageUrl("http://192.168.100.76:8080/carrentz/api/merchants/vehicles/images/" + hashEntity.get("image_id"));
+            rentByVehicleItem.setImageUrl(Constant.Application.BASE_URL + "merchants/vehicles/images/" + hashEntity.get("image_id"));
             rentByVehicleItem.setDuration(hashEntity.get("duration"));
             rentByVehicleItem.setAmount(hashEntity.get("amount"));
 
@@ -228,7 +228,7 @@ public class ReportService {
             rentByStoreItem.setPhoneNumber(hashEntity.get("phone_number"));
             rentByStoreItem.setAddress(hashEntity.get("address"));
             rentByStoreItem.setCity(hashEntity.get("city"));
-            rentByStoreItem.setImageUrl("http://192.168.100.76:8080/carrentz/api/merchants/stores/images/" + hashEntity.get("id"));
+            rentByStoreItem.setImageUrl(Constant.Application.BASE_URL + "merchants/stores/images/" + hashEntity.get("id"));
             rentByStoreItem.setAmount(hashEntity.get("amount"));
 
             rentByStoreResponse.getRentByStoreItems().add(rentByStoreItem);
